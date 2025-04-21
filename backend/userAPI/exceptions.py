@@ -53,7 +53,7 @@ class PermissionDenied(BaseCustomException):
 
 class UserDoesNotExist(BaseCustomException):
     status_code = status.HTTP_404_NOT_FOUND
-    default_detail = 'El usuario no existe.'
+    default_detail = 'El usuario no existe...'
     default_code = 'user_not_found'
 
 
@@ -61,3 +61,8 @@ class UserAlreadyExists(BaseCustomException):
     status_code = status.HTTP_409_CONFLICT
     default_detail = 'El usuario ya existe.'
     default_code = 'user_already_exists'
+
+class ProfileDoesNotExist(BaseCustomException):
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = 'El perfil no existe.'
+    default_code = 'profile_not_found'

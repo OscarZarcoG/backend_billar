@@ -10,7 +10,7 @@ SECRET_KEY = 'django-insecure-@9xw1s_6tr1277ht-1&ht#!$e!a)rj^ck!97bfi2!aenbu23ax
 DEBUG = True
 
 #ALLOWED_HOSTS = *
-ALLOWED_HOSTS = ['192.168.247.113', '192.168.1.74']
+ALLOWED_HOSTS = ['192.168.247.113', '192.168.1.74', '192.168.1.22']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,9 +22,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
     'userAPI',
     'mesasAPI',
-    'reservasAPI',
 ]
 """
     'sesionesAPI',
@@ -113,6 +113,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = (
     'http://localhost:3000',
     'http://192.168.1.74:8000',
+    'http://192.168.1.22:3000',
 )
 CORS_ALLOW_CREDENTIALS = True
 
@@ -138,10 +139,17 @@ CORS_ALLOW_HEADERS = [
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+
+    'DEFAULT_AUTHENTICATION_CLASSES': [],
+    'DEFAULT_PERMISSION_CLASSES': [],
 }
+
+
+#'DEFAULT_AUTHENTICATION_CLASSES': [
+#        'rest_framework.authentication.SessionAuthentication',
+#       'rest_framework.authentication.TokenAuthentication',
+#    ],
+
 
 AUTHENTICATION_BACKENDS = [
     'userAPI.authentication.EmailOrUsernameModelBackend',

@@ -1,110 +1,93 @@
 # userAPI/views.py
-from rest_framework.views import APIView
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from django.contrib.auth.models import User
-from .serializers import UserSerializer
-from .exceptions import (
-    UserDoesNotExist,  PermissionDenied, InvalidCredentials,
-    UsernameRequired, PasswordRequired,
-)
-from .responses import  (
-    UserUpdatedSuccess, UserDeletedSuccess, UserCreatedSuccess,
-    UserLoginSuccess, UserLogoutSuccess
-)
+from core.exceptions import DatabaseError, BaseCustomException, AuthenticationFailed
 from django.contrib.auth import authenticate, login, logout
-from core.exceptions import DatabaseError, BaseCustomException
-from core.responses import BaseSuccessResponse
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
+
+from .exceptions import (
+    InvalidCredentials, UsernameRequired,
+    PasswordRequired, UserAlreadyExists
+)
+from .responses import (
+    UserCreatedSuccess, UserLoginSuccess, UserLogoutSuccess
+)
+from .serializers import UserSerializer
 
 
 class UserLoginView(APIView):
+
     @staticmethod
     def post(request):
         username = request.data.get('username')
         password = request.data.get('password')
 
-        if not username or not password:
-            raise [UsernameRequired(), PasswordRequired()]
+        if not username:
+            raise UsernameRequired()
+        if not password:
+            raise PasswordRequired()
 
-        user = authenticate(request, username=username, password=password)
+        try:
+            user = authenticate(request, username=username, password=password)
 
-        if user is not None:
-            login(request, user)
-            serializer = UserSerializer(user)
-            return UserLoginSuccess(data=serializer.data).to_response()
-        else:
-            raise InvalidCredentials()
+            if user is not None:
+                login(request, user)
+                token, created = Token.objects.get_or_create(user=user)
+
+                serializer = UserSerializer(user)
+                response_data = serializer.data
+                response_data['token'] = token.key
+
+
+                return UserLoginSuccess(data=response_data).to_response()
+            else:
+                raise InvalidCredentials()
+        except BaseCustomException as e:
+            raise e
+        except Exception:
+            raise DatabaseError()
 
 
 class UserLogoutView(APIView):
-    @staticmethod
-    def post(self, request):
-        logout(request)
-        return UserLogoutSuccess().to_response()
-
-
-class UserCreateView(APIView):
-    parser_classes = (MultiPartParser, FormParser, JSONParser)
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @staticmethod
-    def post(self, request):
+    def post(request):
+        try:
+            request.user.auth_token.delete()
+            logout(request)
+            return UserLogoutSuccess().to_response()
+        except Exception:
+            raise DatabaseError()
+
+
+class UserSignUpView(APIView):
+
+    @staticmethod
+    def post(request):
         try:
             serializer = UserSerializer(data=request.data)
             if serializer.is_valid():
                 user = serializer.save()
-                return UserCreatedSuccess(data=UserSerializer(user).data).to_response()
-            else:
-                raise BaseCustomException(detail=serializer.errors)
-        except Exception as e:
-            if isinstance(e, BaseCustomException):
-                raise e
-            raise DatabaseError(str(e))
 
+                token, created = Token.objects.get_or_create(user=user)
 
-class UserDetailView(APIView):
-    parser_classes = (MultiPartParser, FormParser, JSONParser)
+                response_data = serializer.data
+                response_data['token'] = token.key
 
-    @staticmethod
-    def get(self, request, pk):
-        try:
-            user = User.objects.get(pk=pk)
-            if user != request.user:
-                raise PermissionDenied()
+                return UserCreatedSuccess(data=serializer.data).to_response()
+            errors = serializer.errors
+            if 'username' in errors and 'This field is required' in str(errors['username']):
+                raise UsernameRequired()
+            if 'password' in errors and 'This field is required' in str(errors['password']):
+                raise PasswordRequired()
 
-            serializer = UserSerializer(user)
-            return BaseSuccessResponse(data=serializer.data).to_response()
-        except User.DoesNotExist:
-            raise UserDoesNotExist()
-        except Exception as e:
-            raise DatabaseError(str(e))
-
-    @staticmethod
-    def put(self, request, pk):
-        try:
-            user = User.objects.get(pk=pk)
-            if user != request.user:
-                raise PermissionDenied()
-
-            serializer = UserSerializer(user, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return UserUpdatedSuccess(data=serializer.data).to_response()
-            else:
-                raise BaseCustomException(detail=serializer.errors)
-        except User.DoesNotExist:
-            raise UserDoesNotExist()
-        except Exception as e:
-            raise DatabaseError(str(e))
-
-    @staticmethod
-    def delete(self, request, pk):
-        try:
-            user = User.objects.get(pk=pk)
-            if user != request.user:
-                raise PermissionDenied()
-
-            user.delete()
-            return UserDeletedSuccess().to_response()
-        except User.DoesNotExist:
-            raise UserDoesNotExist()
-        except Exception as e:
-            raise DatabaseError(str(e))
+            raise AuthenticationFailed()
+        except UserAlreadyExists:
+            raise
+        except BaseCustomException as e:
+            raise e
+        except Exception:
+            raise DatabaseError()

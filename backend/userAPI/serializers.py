@@ -2,7 +2,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import UserProfile
-from .exceptions import UserAlreadyExists
+from .exceptions import UserAlreadyExists, PasswordRequired
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -23,8 +23,11 @@ class UserSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile', {})
         username = validated_data.get('username')
 
-        if User.objects.filter(username=username).exists():
+        if User.objects.filter(username=userkname).exists():
             raise UserAlreadyExists()
+
+        if 'password' not in validated_data:
+            raise PasswordRequired()
 
         user = User.objects.create_user(
             username=username,
@@ -32,9 +35,9 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
         if profile_data and 'profile_picture' in profile_data:
-            UserProfile.objects.filter(user=user).update(
-                profile_picture=profile_data['profile_picture']
-            )
+            if hasattr(user, 'profile'):
+                user.profile.profile_picture = profile_data['profile_picture']
+                user.profile.save()
 
         return user
 
@@ -49,8 +52,14 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
 
         if profile_data and 'profile_picture' in profile_data:
-            profile = instance.profile
-            profile.profile_picture = profile_data.get('profile_picture')
-            profile.save()
+            try:
+                profile = instance.profile
+                profile.profile_picture = profile_data.get('profile_picture')
+                profile.save()
+            except UserProfile.DoesNotExist:
+                UserProfile.objects.create(
+                    user=instance,
+                    profile_picture=profile_data.get('profile_picture')
+                )
 
         return instance
