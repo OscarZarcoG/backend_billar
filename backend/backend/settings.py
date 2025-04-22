@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     'django_filters',
     'userAPI',
     'mesasAPI',
+    'clienteAPI',
+    'tipoRentaAPI',
 ]
 """
     'sesionesAPI',
