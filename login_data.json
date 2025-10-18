@@ -131,7 +131,9 @@
         "auth_required": true,
         "headers": {
           "Authorization": "Token {token}"
-        }
+        },
+        "code": "204 No Content",
+        "status": "Running"
       },
       "change_user_role": {
         "url": "/auth/{id}/change-user-role/",
@@ -141,7 +143,9 @@
         "headers": {
           "Authorization": "Token {token}"
         },
-        "body_example": "change_role_data"
+        "body_example": "change_role_data",
+        "code": "200 OK",
+        "status": "Running"
       },
       "hard_delete": {
         "url": "/auth/{id}/hard-delete/",
@@ -150,7 +154,9 @@
         "auth_required": true,
         "headers": {
           "Authorization": "Token {token}"
-        }
+        },
+        "code": "204 No Content",
+        "status": "Running"
       },
       "restore": {
         "url": "/auth/{id}/restore/",
@@ -159,7 +165,9 @@
         "auth_required": true,
         "headers": {
           "Authorization": "Token {token}"
-        }
+        },
+        "code": "200 OK",
+        "status": "Running"
       }
     }
   },

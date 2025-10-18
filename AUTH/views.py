@@ -216,13 +216,13 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         instance.delete(user=request.user)
         
         return Response({
-            'message': 'Usuario desactivado exitosamente (soft delete)'
+            'message': 'Usuario desactivado exitosamente'
         }, status=status.HTTP_204_NO_CONTENT)
     
     @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
     def hard_delete_user(self, request, pk=None):
-        if request.user.role != 'root':
-            raise PermissionDenied(detail='Solo el usuario root puede realizar borrado completo')
+        if request.user.role != 'root' and request.user.role != 'admin':
+            raise PermissionDenied(detail='Solo los usuarios root o admin pueden realizar borrado completo')
         
         user = self.get_object()
         
@@ -232,7 +232,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         try:
             user.hard_delete(user=request.user)
             return Response({
-                'message': 'Usuario eliminado completamente (hard delete)'
+                'message': 'Usuario eliminado completamente'
             }, status=status.HTTP_204_NO_CONTENT)
         except PermissionError as e:
             raise PermissionDenied(detail=str(e))
@@ -243,11 +243,11 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             raise PermissionDenied(detail='Solo administradores y root pueden restaurar usuarios')
         
         try:
-            user = UserCustom.objects.all_with_deleted().get(pk=pk)
+            user = UserCustom.objects.all_objects().get(pk=pk)
         except UserCustom.DoesNotExist:
             raise NotFoundError(detail='Usuario no encontrado')
         
-        if not user.is_deleted():
+        if not user.is_deleted:
             raise ValidationError(detail='El usuario no está borrado')
         
         user.restore()

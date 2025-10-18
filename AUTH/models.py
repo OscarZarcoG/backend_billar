@@ -2,6 +2,7 @@
 from django.contrib.auth.models import AbstractUser, UserManager
 from core.models import BaseModel, BaseManager
 from django.db import models
+from django.utils import timezone
 
 
 class UserCustomManager(BaseManager, UserManager):
@@ -139,13 +140,34 @@ class UserCustom(AbstractUser, BaseModel):
         help_text="Rol del usuario"
     )
     
+    def delete(self, hard_delete=False, **kwargs):
+        """
+        Sobrescribe el método delete para manejar el soft delete
+        y actualizar el campo is_active de Django
+        """
+        if hard_delete:
+            # Filtrar kwargs para solo pasar los argumentos que acepta Django Model.delete()
+            django_delete_kwargs = {k: v for k, v in kwargs.items() if k in ['using']}
+            return super(BaseModel, self).delete(**django_delete_kwargs)
+        
+        # Soft delete: establecer deleted_at y desactivar el usuario
+        self.deleted_at = timezone.now()
+        self.is_active = False  # Desactivar el usuario en Django
+        self.save()
+
+    def restore(self):
+        """
+        Restaura un usuario eliminado con soft delete
+        """
+        self.deleted_at = None
+        self.is_active = True  # Reactivar el usuario en Django
+        self.save()
     
     def save(self, *args, **kwargs):
         """
         Sobrescribe el método save para establecer automáticamente
         is_staff e is_superuser según el rol del usuario
         """
-        # Solo establecer permisos automáticamente si no se han establecido explícitamente
         if not hasattr(self, '_skip_role_permissions'):
             # Establecer permisos según el rol
             if self.role == 'root':
