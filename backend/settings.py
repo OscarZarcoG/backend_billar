@@ -39,7 +39,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'backend_billar.urls'
 
 TEMPLATES = [
     {
@@ -56,9 +56,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = 'backend_billar.wsgi.application'
 
-ASGI_APPLICATION = 'backend.asgi.application'
+ASGI_APPLICATION = 'backend_billar.asgi.application'
 
 
 DATABASES = {
