@@ -1,0 +1,31 @@
+
+""" V E N T A S """
+class VentaDirecta(BaseModel):
+    productos = models.ManyToManyField(Producto, through='DetalleVenta', verbose_name="Productos")
+    cantidad = models.IntegerField(default=0, verbose_name="Cantidad")
+    cliente = models.ForeignKey(Provedores, on_delete=models.PROTECT, related_name='ventas', verbose_name="Cliente", blank=True, null=True)
+    fecha = models.DateField(auto_now_add=True, verbose_name="Fecha")
+    total = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total")
+
+    def __str__(self):
+        return self.cliente
+
+    class Meta:
+        verbose_name = "Venta"
+        verbose_name_plural = "Ventas"
+
+""" D E T A L L E S  V E N T A S """
+class DetalleVenta(BaseModel):
+    venta = models.ForeignKey(VentaDirecta, on_delete=models.CASCADE, related_name='detalles', verbose_name="Venta")
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='ventas', verbose_name="Producto")
+    cantidad = models.IntegerField(default=1, verbose_name="Cantidad")
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Precio unitario")
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Subtotal")
+
+    def __str__(self):
+        return self.venta
+
+    class Meta:
+        verbose_name = "Detalle de Venta"
+        verbose_name_plural = "Detalles de Venta"
+

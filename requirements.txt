@@ -1,0 +1,28 @@
+# Django y dependencias principales
+Django>=4.2.0,<5.0.0
+djangorestframework>=3.14.0
+django-cors-headers>=4.0.0
+django-filter>=23.0.0
+
+# Base de datos
+psycopg2-binary>=2.9.0
+
+# Autenticación y tokens
+#djangorestframework-authtoken
+
+# Utilidades para Python
+Pillow>=9.0.0
+
+# Dependencias para desarrollo (opcional)
+# python-decouple>=3.6  # Para manejo de variables de entorno
+# django-debug-toolbar>=4.0.0  # Para debugging en desarrollo
+
+# Dependencias del sistema
+# Estas son las librerías estándar de Python que ya vienen incluidas:
+# - os
+# - sys
+# - pathlib
+# - datetime
+# - decimal
+# - math
+# - logging
