@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: billar-backend
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn backend.wsgi:application"
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: billar-db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: "billar-backend.onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://your-frontend-domain.com"
+
+  - type: pserv
+    name: billar-db
+    env: postgresql
+    plan: free
+    databaseName: bd_billar
+    databaseUser: postgres
