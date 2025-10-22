@@ -1,3 +1,14 @@
+Hice deploy en Render (lo pagué), subí una BD en postgres y una API (BACKEND) en django, ya funciona la conexión entre backend y bd, pero cuando intento acceder a: https://backend-billar.onrender.com/admin/login/?next=/admin/
+
+me sale error: Server Error (500)
+
+En los logs me sale:
+     ==> Detected service running on port 10000
+     ==> Docs on specifying a port: https://render.com/docs/web-services#port-binding
+     [GET]404backend-billar.onrender.com/favicon.icoclientIP="189.251.96.142" requestID="d1b97c80-4720-403d" responseTimeMS=5 responseBytes=458 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0"
+     [GET]500backend-billar.onrender.com/admin/login/?next=/admin/clientIP="189.251.96.142" requestID="c47049fa-c664-4f34" responseTimeMS=23 responseBytes=437 userAgent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0"
+
+Este es el archivo settings.py:
 # backend/settings.py
 import os
 from pathlib import Path
@@ -176,40 +187,77 @@ REST_FRAMEWORK = {
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Configuración de logging para producción
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['console'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-    },
-}
+wsgi.py:
+"""
+WSGI config for backend project.
+
+It exposes the WSGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
+"""
+
+import os
+
+from django.core.wsgi import get_wsgi_application
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+
+application = get_wsgi_application()
+
+
+.env:
+# Configuración de la base de datos de Render
+DATABASE_URL=postgresql://postgress:VQ53WZbLBDYJkuQ7CT7pWEXHwUwoCImu@dpg-d3s0ggu3jp1c73eijn30-a.virginia-postgres.render.com/bd_billar
+
+# Configuración individual de la base de datos (alternativa)
+DATABASE_NAME=bd_billar
+DATABASE_USER=postgress
+DATABASE_PASSWORD=VQ53WZbLBDYJkuQ7CT7pWEXHwUwoCImu
+DATABASE_HOST=dpg-d3s0ggu3jp1c73eijn30-a.virginia-postgres.render.com
+DATABASE_PORT=5432
+
+# Configuración de Django
+SECRET_KEY=django-insecure-@9xw1s_6tr1277ht-1&ht#!$e!a)rj^ck!97bfi2!aenbu23ax
+DEBUG=False
+ALLOWED_HOSTS=localhost,127.0.0.1,*.onrender.com
+
+# Configuración de CORS
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+
+
+render.yaml:
+services:
+  - type: web
+    name: billar-backend
+    env: python
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --no-input &&
+      python manage.py migrate
+    startCommand: gunicorn backend_billar.wsgi:application --bind 0.0.0.0:$PORT
+    plan: free
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: billar-db
+          property: connectionString
+      - key: ALLOWED_HOSTS
+        value: "billar-backend.onrender.com"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://your-frontend-domain.com"
+
+databases:
+  - name: billar-db
+    databaseName: bd_billar
+    user: postgress 
+
+
+POR QUÉ NO ME DEJA ACCEDER AL ORM DE DJANGO?
+EN DESARROLLO SI ME DEJA ACCEDER, PERO EN PROUCCIÓN YA NO ME DEJA
