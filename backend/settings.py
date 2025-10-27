@@ -24,7 +24,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
-    'AUTH',
+    'drf_spectacular',  # Para documentación OpenAPI/Swagger
+    'AUTH'
 ]
 
 
@@ -173,7 +174,22 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
         #'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     # 'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
+}
+
+# Configuración de drf-spectacular para documentación OpenAPI/Swagger
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'API Billar System',
+    'DESCRIPTION': 'API para sistema de gestión de billar con autenticación y manejo de clientes',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    'COMPONENT_SPLIT_REQUEST': True
 }
 
 
