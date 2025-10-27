@@ -1,0 +1,182 @@
+October 27, 2025 at 5:27 PM
+failed
+79b05e5
+feat(api): add OpenAPI/Swagger documentation support - Add drf-spectacular for API documentation - Configure schema endpoints and UI views - Update settings for OpenAPI documentation - Clean up .env file with development/production sections
+Search
+==> Downloading cache...
+==> Cloning from https://github.com/OscarZarcoG/backend_billar
+==> Checking out commit 79b05e5553742902d171fdaa4e888e5036838628 in branch main
+==> Transferred 95MB in 8s. Extraction took 2s.
+==> Installing Python version 3.11.9...
+==> Using Python version 3.11.9 via /opt/render/project/src/.python-version
+==> Docs on specifying a Python version: https://render.com/docs/python-version
+==> Using Poetry version 2.1.3 (default)
+==> Docs on specifying a Poetry version: https://render.com/docs/poetry-version
+==> Running build command 'pip install -r requirements.txt'...
+Collecting Django==4.2.16 (from -r requirements.txt (line 1))
+  Using cached Django-4.2.16-py3-none-any.whl.metadata (4.1 kB)
+Collecting djangorestframework==3.14.0 (from -r requirements.txt (line 2))
+  Using cached djangorestframework-3.14.0-py3-none-any.whl.metadata (10 kB)
+Collecting django-cors-headers==4.3.1 (from -r requirements.txt (line 3))
+  Using cached django_cors_headers-4.3.1-py3-none-any.whl.metadata (16 kB)
+Collecting django-filter==23.5 (from -r requirements.txt (line 4))
+  Using cached django_filter-23.5-py3-none-any.whl.metadata (5.2 kB)
+Collecting psycopg2-binary==2.9.9 (from -r requirements.txt (line 5))
+  Using cached psycopg2_binary-2.9.9-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (4.4 kB)
+Collecting Pillow==10.4.0 (from -r requirements.txt (line 6))
+  Using cached pillow-10.4.0-cp311-cp311-manylinux_2_28_x86_64.whl.metadata (9.2 kB)
+Collecting gunicorn==22.0.0 (from -r requirements.txt (line 7))
+  Using cached gunicorn-22.0.0-py3-none-any.whl.metadata (4.4 kB)
+Collecting python-decouple==3.8 (from -r requirements.txt (line 8))
+  Using cached python_decouple-3.8-py3-none-any.whl.metadata (14 kB)
+Collecting whitenoise==6.7.0 (from -r requirements.txt (line 9))
+  Using cached whitenoise-6.7.0-py3-none-any.whl.metadata (3.7 kB)
+Collecting dj-database-url==2.2.0 (from -r requirements.txt (line 10))
+  Using cached dj_database_url-2.2.0-py3-none-any.whl.metadata (12 kB)
+Collecting asgiref<4,>=3.6.0 (from Django==4.2.16->-r requirements.txt (line 1))
+  Using cached asgiref-3.10.0-py3-none-any.whl.metadata (9.3 kB)
+Collecting sqlparse>=0.3.1 (from Django==4.2.16->-r requirements.txt (line 1))
+  Using cached sqlparse-0.5.3-py3-none-any.whl.metadata (3.9 kB)
+Collecting pytz (from djangorestframework==3.14.0->-r requirements.txt (line 2))
+  Using cached pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
+Collecting packaging (from gunicorn==22.0.0->-r requirements.txt (line 7))
+  Using cached packaging-25.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting typing-extensions>=3.10.0.0 (from dj-database-url==2.2.0->-r requirements.txt (line 10))
+  Using cached typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+Using cached Django-4.2.16-py3-none-any.whl (8.0 MB)
+Using cached djangorestframework-3.14.0-py3-none-any.whl (1.1 MB)
+Using cached django_cors_headers-4.3.1-py3-none-any.whl (12 kB)
+Using cached django_filter-23.5-py3-none-any.whl (94 kB)
+Using cached psycopg2_binary-2.9.9-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (3.0 MB)
+Using cached pillow-10.4.0-cp311-cp311-manylinux_2_28_x86_64.whl (4.5 MB)
+Using cached gunicorn-22.0.0-py3-none-any.whl (84 kB)
+Using cached python_decouple-3.8-py3-none-any.whl (9.9 kB)
+Using cached whitenoise-6.7.0-py3-none-any.whl (19 kB)
+Using cached dj_database_url-2.2.0-py3-none-any.whl (7.8 kB)
+Using cached asgiref-3.10.0-py3-none-any.whl (24 kB)
+Using cached sqlparse-0.5.3-py3-none-any.whl (44 kB)
+Using cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Using cached packaging-25.0-py3-none-any.whl (66 kB)
+Using cached pytz-2025.2-py2.py3-none-any.whl (509 kB)
+Installing collected packages: pytz, python-decouple, whitenoise, typing-extensions, sqlparse, psycopg2-binary, Pillow, packaging, asgiref, gunicorn, Django, djangorestframework, django-filter, django-cors-headers, dj-database-url
+Successfully installed Django-4.2.16 Pillow-10.4.0 asgiref-3.10.0 dj-database-url-2.2.0 django-cors-headers-4.3.1 django-filter-23.5 djangorestframework-3.14.0 gunicorn-22.0.0 packaging-25.0 psycopg2-binary-2.9.9 python-decouple-3.8 pytz-2025.2 sqlparse-0.5.3 typing-extensions-4.15.0 whitenoise-6.7.0
+[notice] A new release of pip is available: 24.0 -> 25.2
+[notice] To update, run: pip install --upgrade pip
+==> Uploading build...
+==> Uploaded in 9.7s. Compression took 21.7s
+==> Build successful 🎉
+==> Deploying...
+==> Running 'gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT'
+Traceback (most recent call last):
+  File "/opt/render/project/src/.venv/bin/gunicorn", line 8, in <module>
+    sys.exit(run())
+             ^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 67, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/base.py", line 236, in run
+    super().run()
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/base.py", line 72, in run
+    Arbiter(self).run()
+    ^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/arbiter.py", line 58, in __init__
+    self.setup(app)
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/arbiter.py", line 118, in setup
+    self.app.wsgi()
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+                    ^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+    mod = importlib.import_module(module)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/python/Python-3.11.9/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/opt/render/project/src/backend/wsgi.py", line 16, in <module>
+    application = get_wsgi_application()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/django/core/wsgi.py", line 12, in get_wsgi_application
+    django.setup(set_prefix=False)
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/django/apps/config.py", line 193, in create
+    import_module(entry)
+  File "/opt/render/project/python/Python-3.11.9/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1140, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'drf_spectacular'
+==> Exited with status 1
+==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
+==> Running 'gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT'
+Traceback (most recent call last):
+  File "/opt/render/project/src/.venv/bin/gunicorn", line 8, in <module>
+    sys.exit(run())
+             ^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 67, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/base.py", line 236, in run
+    super().run()
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/base.py", line 72, in run
+    Arbiter(self).run()
+    ^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/arbiter.py", line 58, in __init__
+    self.setup(app)
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/arbiter.py", line 118, in setup
+    self.app.wsgi()
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+                    ^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 58, in load
+    return self.load_wsgiapp()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 48, in load_wsgiapp
+    return util.import_app(self.app_uri)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/gunicorn/util.py", line 371, in import_app
+    mod = importlib.import_module(module)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/python/Python-3.11.9/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/opt/render/project/src/backend/wsgi.py", line 16, in <module>
+    application = get_wsgi_application()
+                  ^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/django/core/wsgi.py", line 12, in get_wsgi_application
+    django.setup(set_prefix=False)
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/django/__init__.py", line 24, in setup
+    apps.populate(settings.INSTALLED_APPS)
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/django/apps/registry.py", line 91, in populate
+    app_config = AppConfig.create(entry)
+                 ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/render/project/src/.venv/lib/python3.11/site-packages/django/apps/config.py", line 193, in create
+    import_module(entry)
+  File "/opt/render/project/python/Python-3.11.9/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1140, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'drf_spectacular'
