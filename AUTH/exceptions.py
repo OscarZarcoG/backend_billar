@@ -32,6 +32,12 @@ class UserAlreadyExists(BaseAPIException):
     default_code = 'user_already_exists'
     error_type = 'conflict_error'
     
+class EmailAlreadyExists(BaseAPIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = 'El correo electrónico ya está registrado.'
+    default_code = 'email_already_exists'
+    error_type = 'conflict_error'
+    
 class UsernameRequired(BaseAPIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = 'El nombre de usuario es requerido.'

@@ -10,8 +10,8 @@ from .models import UserCustom
 from .serializers import UserCustomSerializer, LoginSerializer, UserRegistrationSerializer, UserRegistrationResponseSerializer, UserBasicSerializer
 from .exceptions import (
     PasswordMismatch, PasswordRequired, UsernameRequired,
-    InvalidCredentials, UserDoesNotExist, UserAlreadyExists,
-    PermissionDenied
+    EmailAlreadyExists, UserAlreadyExists,
+    PermissionDenied, PasswordTooShort, EmailRequired
 )
 from core.exceptions import ValidationError, NotFoundError
 
@@ -127,12 +127,10 @@ class UserCustomViewSet(viewsets.ModelViewSet):
                     "token": "a1b2c3d4e5f6g7h8i9j0",
                     "message": "Usuario registrado exitosamente"
                 },
-                
             ),
             OpenApiExample(
-                'Error de validación',
+                'Errores de validación',
                 value={
-                    'detail': 'Los datos proporcionados no son válidos',
                     'errors': {
                         'username': [
                             'Este campo es requerido.'
@@ -156,17 +154,19 @@ class UserCustomViewSet(viewsets.ModelViewSet):
     def register(self, request):
         username = request.data.get('username')
         email = request.data.get('email')
+        password = request.data.get('password')
+        password_confirm = request.data.get('password_confirm')
         
         # El nombre de usuario es requerido
-        if username.strip() == '':
+        if not username or username.strip() == '':
             raise UsernameRequired()
         
         # El email es requerido
-        if email.strip() == '':
+        if not email or email.strip() == '':
             raise EmailRequired()
         
         # Contraseña es requerida
-        if password and not password_confirm:
+        if not password or password.strip() == '':
             raise PasswordRequired()
         
         # El usuario ya está registrado
@@ -175,10 +175,10 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         
         # El email ya está registrado
         if email and UserCustom.objects.filter(email=email).exists():
-            raise UserAlreadyExists()
+            raise EmailAlreadyExists()
         
         # Tamaño de contraseña 
-        if password.strip() and len(password.strip()) < 8:
+        if password and len(password.strip()) < 8:
             raise PasswordTooShort()
         
         # Confirmación de contraseñas iguales
