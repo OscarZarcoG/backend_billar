@@ -44,16 +44,6 @@ from core.exceptions import ValidationError, NotFoundError
     ),
 )
 class UserCustomViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet para gestión completa de usuarios.
-    
-    Proporciona operaciones CRUD y acciones adicionales para:
-    - Registro de nuevos usuarios
-    - Autenticación (login/logout)
-    - Gestión de perfiles
-    - Cambio de contraseñas
-    - Gestión de roles
-    """
     queryset = UserCustom.objects.all()
     serializer_class = UserCustomSerializer
     
@@ -98,41 +88,68 @@ class UserCustomViewSet(viewsets.ModelViewSet):
     
     @extend_schema(
         summary="Registrar nuevo usuario",
-        description="Crea un nuevo usuario en el sistema con rol 'client' por defecto",
         tags=["Autenticación"],
         request=UserRegistrationSerializer,
         responses={
             201: UserRegistrationResponseSerializer,
-            400: OpenApiTypes.OBJECT,
         },
         examples=[
             OpenApiExample(
                 'Ejemplo de registro',
                 value={
-                    'username': 'nuevo_usuario',
-                    'email': 'usuario@example.com',
-                    'password': 'password123',
-                    'first_name': 'Juan',
-                    'last_name': 'Pérez'
+                        "username": "pedro_cliente",
+                        "first_name": "Pedro",
+                        "last_name": "Samano",
+                        "email": "pedro.samano@example.com",
+                        "password": "pedro123",
+                        "password_confirm": "pedro123",
+                        "phone": "987654321",
+                        "birthday": "2004-11-03",
+                        "gender": "male",
+                        "role": "cliente"
                 },
                 request_only=True,
             ),
             OpenApiExample(
                 'Respuesta exitosa',
                 value={
-                    'user': {
-                        'id': 1,
-                        'username': 'nuevo_usuario',
-                        'email': 'usuario@example.com',
-                        'first_name': 'Juan',
-                        'last_name': 'Pérez',
-                        'role': 'client'
+                    "user": {
+                        "id": 1,
+                        "username": "pedro_cliente",
+                        "first_name": "Pedro",
+                        "last_name": "Samano",
+                        "email": "pedro.samano@example.com",
+                        "phone": "987654321",
+                        "birthday": "2004-11-03",
+                        "gender": "male",
+                        "role": "cliente"
                     },
-                    'token': 'a1b2c3d4e5f6g7h8i9j0',
-                    'message': 'Usuario registrado exitosamente como client'
+                    "token": "a1b2c3d4e5f6g7h8i9j0",
+                    "message": "Usuario registrado exitosamente"
+                },
+                
+            ),
+            OpenApiExample(
+                'Error de validación',
+                value={
+                    'detail': 'Los datos proporcionados no son válidos',
+                    'errors': {
+                        'username': [
+                            'Este campo es requerido.'
+                        ],
+                        'email': [
+                            'Este campo es requerido.'
+                        ],
+                        'password': [
+                            'Este campo es requerido.'
+                        ],
+                        'password_confirm': [
+                            'Este campo es requerido.'
+                        ]
+                    }
                 },
                 response_only=True,
-            ),
+            )
         ]
     )
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
@@ -140,11 +157,33 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         username = request.data.get('username')
         email = request.data.get('email')
         
-        if username and UserCustom.objects.filter(username=username).exists():
-            raise UserAlreadyExists(detail=f'El nombre de usuario "{username}" ya está en uso')
+        # El nombre de usuario es requerido
+        if username.strip() == '':
+            raise UsernameRequired()
         
+        # El email es requerido
+        if email.strip() == '':
+            raise EmailRequired()
+        
+        # Contraseña es requerida
+        if password and not password_confirm:
+            raise PasswordRequired()
+        
+        # El usuario ya está registrado
+        if username and UserCustom.objects.filter(username=username).exists():
+            raise UserAlreadyExists()
+        
+        # El email ya está registrado
         if email and UserCustom.objects.filter(email=email).exists():
-            raise UserAlreadyExists(detail=f'El email "{email}" ya está registrado')
+            raise UserAlreadyExists()
+        
+        # Tamaño de contraseña 
+        if password.strip() and len(password.strip()) < 8:
+            raise PasswordTooShort()
+        
+        # Confirmación de contraseñas iguales
+        if password and password_confirm and password != password_confirm:
+            raise PasswordMismatch()
         
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -153,7 +192,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             return Response({
                 'user': UserRegistrationResponseSerializer(user).data,
                 'token': token.key,
-                'message': 'Usuario registrado exitosamente como client'
+                'message': 'Usuario registrado exitosamente'
             }, status=status.HTTP_201_CREATED)
         
         return Response({

@@ -13,12 +13,38 @@ class PasswordRequired(BaseAPIException):
     default_detail = 'La contraseña es requerida.'
     default_code = 'password_required'
     error_type = 'password_error'
+    
+class PasswordTooShort(BaseAPIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = 'La contraseña debe tener al menos 8 caracteres.'
+    default_code = 'password_too_short'
+    error_type = 'password_error'
 
+class PermissionDenied(BaseAPIException):
+    status_code = status.HTTP_403_FORBIDDEN
+    default_detail = 'No tienes permiso para realizar esta acción.'
+    default_code = 'permission_denied'
+    error_type = 'permission_error'
+
+class UserAlreadyExists(BaseAPIException):
+    status_code = status.HTTP_409_CONFLICT
+    default_detail = 'El nombre de usuario ya existe.'
+    default_code = 'user_already_exists'
+    error_type = 'conflict_error'
+    
 class UsernameRequired(BaseAPIException):
     status_code = status.HTTP_400_BAD_REQUEST
     default_detail = 'El nombre de usuario es requerido.'
     default_code = 'username_required'
     error_type = 'username_error'
+    
+class EmailRequired(BaseAPIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = 'El correo electrónico es requerido.'
+    default_code = 'email_required'
+    error_type = 'email_error'
+
+
 
 class InvalidCredentials(BaseAPIException):
     status_code = status.HTTP_401_UNAUTHORIZED
@@ -44,11 +70,7 @@ class TokenExpired(BaseAPIException):
     default_code = 'token_expired'
     error_type = 'authentication_error'
 
-class PermissionDenied(BaseAPIException):
-    status_code = status.HTTP_403_FORBIDDEN
-    default_detail = 'No tienes permiso para realizar esta acción.'
-    default_code = 'permission_denied'
-    error_type = 'permission_error'
+
 
 class UserDoesNotExist(BaseAPIException):
     status_code = status.HTTP_404_NOT_FOUND
@@ -56,11 +78,7 @@ class UserDoesNotExist(BaseAPIException):
     default_code = 'user_not_found'
     error_type = 'not_found_error'
 
-class UserAlreadyExists(BaseAPIException):
-    status_code = status.HTTP_409_CONFLICT
-    default_detail = 'El usuario ya existe.'
-    default_code = 'user_already_exists'
-    error_type = 'conflict_error'
+
 
 class ProfileDoesNotExist(BaseAPIException):
     status_code = status.HTTP_404_NOT_FOUND

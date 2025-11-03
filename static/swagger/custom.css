@@ -11,7 +11,7 @@
   --text-primary: #1d1d1f;
   --text-secondary: #6e6e73;
 
-  --glass-bg-light: rgba(255, 255, 255, 0.6);
+  --glass-bg-light: rgba(255, 255, 255, 0.4);
   --glass-bg-dark: rgba(30, 30, 30, 0.6);
   --glass-border: rgba(255, 255, 255, 0.3);
 
@@ -19,6 +19,7 @@
   --blur: blur(40px);
 
   --radius: 22px;
+  --extra-radius: 40px;
   --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'SF Mono', ui-monospace, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
 }
@@ -33,7 +34,7 @@
 body {
   font-family: var(--font-system);
   color: var(--text-primary);
-  background: radial-gradient(circle at 30% 70%, #dbe6f6 0%, #cecee9 100%);
+  background: radial-gradient(circle at 30% 70%, #cdd4e0 0%, #cdd4e0 100%);
   background-attachment: fixed;
   -webkit-font-smoothing: antialiased;
   line-height: 1.6;
@@ -53,7 +54,7 @@ body::before {
 
 /* Contenedor */
 #swagger-ui {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
   background: var(--glass-bg-light);
   backdrop-filter: var(--blur) saturate(180%);
@@ -61,7 +62,7 @@ body::before {
   border-radius: var(--radius);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-soft);
-  padding: 48px;
+  padding: 40px;
   position: relative;
   overflow: hidden;
 }
@@ -78,7 +79,7 @@ body::before {
 
 /* Topbar */
 .swagger-ui .topbar {
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(209, 127, 231, 0.6);
   backdrop-filter: blur(25px);
   border-radius: var(--radius) var(--radius) 0 0;
   border-bottom: 1px solid var(--glass-border);
@@ -181,11 +182,11 @@ body::before {
   text-transform: uppercase;
 }
 
-.swagger-ui .opblock-get .opblock-summary-method { background: var(--green); }
-.swagger-ui .opblock-post .opblock-summary-method { background: var(--blue); }
-.swagger-ui .opblock-put .opblock-summary-method { background: var(--orange); }
-.swagger-ui .opblock-delete .opblock-summary-method { background: var(--red); }
-.swagger-ui .opblock-patch .opblock-summary-method { background: var(--purple); }
+.swagger-ui .opblock-get .opblock-summary-method { background: var(--green); border-radius: var(--extra-radius); }
+.swagger-ui .opblock-post .opblock-summary-method { background: var(--blue); border-radius: var(--extra-radius); }
+.swagger-ui .opblock-put .opblock-summary-method { background: var(--orange); border-radius: var(--extra-radius); }
+.swagger-ui .opblock-delete .opblock-summary-method { background: var(--red); border-radius: var(--extra-radius); }
+.swagger-ui .opblock-patch .opblock-summary-method { background: var(--purple); border-radius: var(--extra-radius); }
 
 /* Buttons */
 .swagger-ui .btn {
@@ -249,7 +250,6 @@ body::before {
 
 /* Code blocks */
 .swagger-ui pre, .swagger-ui code {
-  background: #1d1d1f;
   color: #f5f5f7;
   border-radius: 14px;
   padding: 14px 20px;
