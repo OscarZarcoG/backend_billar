@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui.css">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'swagger/custom.css' %}">
+    <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@5.9.0/favicon-32x32.png" sizes="32x32">
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: "{{ schema_url }}",
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                persistAuthorization: true,
+                displayOperationId: false,
+                filter: true,
+                tryItOutEnabled: true,
+                displayRequestDuration: true,
+                docExpansion: "none",
+                defaultModelsExpandDepth: 1,
+                defaultModelExpandDepth: 3,
+                showExtensions: false,
+                showCommonExtensions: false,
+                syntaxHighlight: {
+                    activate: true,
+                    theme: "monokai"
+                },
+                requestInterceptor: (request) => {
+                    const token = localStorage.getItem('a0583c68bd85127c90024f6a7e753e7dc42e9a26');
+                    if (token) {
+                        request.headers['Authorization'] = 'Token ' + token;
+                    }
+                    return request;
+                },
+                onComplete: () => {
+                    console.log('Swagger UI cargado correctamente');
+                }
+            });
+            
+            window.ui = ui;
+        };
+    </script>
+</body>
+</html>

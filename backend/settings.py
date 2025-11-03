@@ -24,14 +24,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_filters',
-    'drf_spectacular',  # Para documentación OpenAPI/Swagger
+    'drf_spectacular',
     'AUTH'
 ]
 
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Para servir archivos estáticos
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -46,7 +46,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -178,34 +178,58 @@ REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
 }
 
-# Configuración de drf-spectacular para documentación OpenAPI/Swagger
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'API Billar System',
-    'DESCRIPTION': 'API para sistema de gestión de billar con autenticación y manejo de clientes',
+    'TITLE': 'PoolZapp API',
+    'DESCRIPTION': '''
+    ## Sistema de Gestión de Billar
+    
+    API RESTful para gestión completa de sistema de billar con:
+    - Autenticación basada en tokens
+    - Gestión de usuarios con roles (client, admin, root)
+    - Sistema de permisos granular
+    - Soft delete y restauración de usuarios
+    
+    ### Autenticación
+    Para usar endpoints protegidos, incluye el token en el header:
+    ```
+    Authorization: Token {{tu_token_aqui}}
+    ```
+    ''',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    
+    # Configuración de la UI
     'SWAGGER_UI_SETTINGS': {
         'deepLinking': True,
         'persistAuthorization': True,
-        'displayOperationId': True,
+        'displayOperationId': False,
+        'docExpansion': 'none',
+        'filter': True,
+        'showExtensions': False,
+        'showCommonExtensions': False,
+        'defaultModelExpandDepth': 3,
+        'defaultModelsExpandDepth': 1,
+        'tryItOutEnabled': True,
+        'displayRequestDuration': True,
+        'tagsSorter': 'alpha',
+        'operationsSorter': 'alpha',
+        'syntaxHighlight.theme': 'monokai',
     },
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SECURITY': [
-        {
-            'tokenAuth': []
-        }
+    
+    # Organización de endpoints
+    'TAGS': [
+        {'name': 'Autenticación', 'description': 'Endpoints para registro, login y logout'},
+        {'name': 'Usuarios', 'description': 'Gestión de usuarios y perfiles'},
+        {'name': 'Roles', 'description': 'Gestión de roles y permisos'},
     ],
-    'COMPONENTS': {
-        'securitySchemes': {
-            'tokenAuth': {
-                'type': 'apiKey',
-                'in': 'header',
-                'name': 'Authorization',
-                'description': 'Token-based authentication with required prefix "Token"'
-            }
-        }
-    }
+    
+    # Configuración de servidores
+    'SERVERS': [
+        {'url': 'http://localhost:8000', 'description': 'Servidor de desarrollo'},
+        {'url': 'https://backend-billar.onrender.com', 'description': 'Servidor de producción'},
+    ],
 }
+
 
 
 #'DEFAULT_AUTHENTICATION_CLASSES': [

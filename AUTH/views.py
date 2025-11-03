@@ -1,12 +1,11 @@
-# AUTH/views.py
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import check_password
+from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
 from .models import UserCustom
 from .serializers import UserCustomSerializer, LoginSerializer, UserRegistrationSerializer, UserRegistrationResponseSerializer, UserBasicSerializer
 from .exceptions import (
@@ -17,7 +16,44 @@ from .exceptions import (
 from core.exceptions import ValidationError, NotFoundError
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Listar usuarios",
+        description="Obtiene la lista de todos los usuarios activos del sistema",
+        tags=["Usuarios"]
+    ),
+    retrieve=extend_schema(
+        summary="Obtener usuario por ID",
+        description="Obtiene los detalles de un usuario específico",
+        tags=["Usuarios"]
+    ),
+    update=extend_schema(
+        summary="Actualizar usuario",
+        description="Actualiza completamente la información de un usuario",
+        tags=["Usuarios"]
+    ),
+    partial_update=extend_schema(
+        summary="Actualizar parcialmente usuario",
+        description="Actualiza parcialmente la información de un usuario",
+        tags=["Usuarios"]
+    ),
+    destroy=extend_schema(
+        summary="Desactivar usuario",
+        description="Realiza un soft delete del usuario (desactivación)",
+        tags=["Usuarios"]
+    ),
+)
 class UserCustomViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet para gestión completa de usuarios.
+    
+    Proporciona operaciones CRUD y acciones adicionales para:
+    - Registro de nuevos usuarios
+    - Autenticación (login/logout)
+    - Gestión de perfiles
+    - Cambio de contraseñas
+    - Gestión de roles
+    """
     queryset = UserCustom.objects.all()
     serializer_class = UserCustomSerializer
     
@@ -60,6 +96,45 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         
         return super().partial_update(request, *args, **kwargs)
     
+    @extend_schema(
+        summary="Registrar nuevo usuario",
+        description="Crea un nuevo usuario en el sistema con rol 'client' por defecto",
+        tags=["Autenticación"],
+        request=UserRegistrationSerializer,
+        responses={
+            201: UserRegistrationResponseSerializer,
+            400: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Ejemplo de registro',
+                value={
+                    'username': 'nuevo_usuario',
+                    'email': 'usuario@example.com',
+                    'password': 'password123',
+                    'first_name': 'Juan',
+                    'last_name': 'Pérez'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Respuesta exitosa',
+                value={
+                    'user': {
+                        'id': 1,
+                        'username': 'nuevo_usuario',
+                        'email': 'usuario@example.com',
+                        'first_name': 'Juan',
+                        'last_name': 'Pérez',
+                        'role': 'client'
+                    },
+                    'token': 'a1b2c3d4e5f6g7h8i9j0',
+                    'message': 'Usuario registrado exitosamente como client'
+                },
+                response_only=True,
+            ),
+        ]
+    )
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
         username = request.data.get('username')
@@ -86,6 +161,40 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        summary="Iniciar sesión",
+        description="Autentica un usuario y retorna un token de acceso",
+        tags=["Autenticación"],
+        request=LoginSerializer,
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Ejemplo de login',
+                value={
+                    'username': 'mi_usuario',
+                    'password': 'mi_password'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Respuesta exitosa',
+                value={
+                    'user': {
+                        'id': 1,
+                        'username': 'mi_usuario',
+                        'email': 'usuario@example.com',
+                        'role': 'client'
+                    },
+                    'token': 'a1b2c3d4e5f6g7h8i9j0',
+                    'message': 'Login exitoso'
+                },
+                response_only=True,
+            ),
+        ]
+    )
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def login(self, request):
         serializer = self.get_serializer(data=request.data)
@@ -103,6 +212,24 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        summary="Cerrar sesión",
+        description="Invalida el token de autenticación del usuario actual",
+        tags=["Autenticación"],
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Respuesta exitosa',
+                value={
+                    'message': 'Logout exitoso'
+                },
+                response_only=True,
+            ),
+        ]
+    )
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def logout(self, request):
         try:
@@ -116,11 +243,29 @@ class UserCustomViewSet(viewsets.ModelViewSet):
                 meta={'error_details': str(e)}
             )
     
+    @extend_schema(
+        summary="Obtener perfil actual",
+        description="Obtiene la información del usuario autenticado",
+        tags=["Usuarios"],
+        responses={
+            200: UserCustomSerializer,
+        },
+    )
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
     
+    @extend_schema(
+        summary="Actualizar perfil",
+        description="Actualiza la información del usuario autenticado",
+        tags=["Usuarios"],
+        request=UserCustomSerializer,
+        responses={
+            200: UserCustomSerializer,
+            400: OpenApiTypes.OBJECT,
+        },
+    )
     @action(detail=False, methods=['put', 'patch'], permission_classes=[IsAuthenticated])
     def update_profile(self, request):
         if 'role' in request.data and request.user.role != 'root':
@@ -143,6 +288,43 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             field_errors=serializer.errors
         )
     
+    @extend_schema(
+        summary="Cambiar contraseña",
+        description="Cambia la contraseña del usuario autenticado",
+        tags=["Usuarios"],
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'old_password': {'type': 'string'},
+                    'new_password': {'type': 'string'},
+                },
+                'required': ['old_password', 'new_password']
+            }
+        },
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Ejemplo de cambio de contraseña',
+                value={
+                    'old_password': 'password_actual',
+                    'new_password': 'nueva_password123'
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                'Respuesta exitosa',
+                value={
+                    'message': 'Contraseña cambiada exitosamente',
+                    'token': 'nuevo_token_a1b2c3d4'
+                },
+                response_only=True,
+            ),
+        ]
+    )
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def change_password(self, request):
         old_password = request.data.get('old_password')
@@ -171,6 +353,25 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             'token': token.key
         })
     
+    @extend_schema(
+        summary="Listar usuarios por rol",
+        description="Obtiene usuarios filtrados por rol. Solo para admin y root.",
+        tags=["Roles"],
+        parameters=[
+            OpenApiParameter(
+                name='role',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description='Rol para filtrar (client, admin, root)',
+                enum=['client', 'admin', 'root'],
+                required=False
+            ),
+        ],
+        responses={
+            200: UserCustomSerializer(many=True),
+            403: OpenApiTypes.OBJECT,
+        },
+    )
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def users_by_role(self, request):
         if request.user.role not in ['admin', 'root']:
@@ -185,6 +386,35 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(users, many=True)
         return Response(serializer.data)
     
+    @extend_schema(
+        summary="Cambiar rol de usuario",
+        description="Cambia el rol de un usuario. Solo para usuario root.",
+        tags=["Roles"],
+        request={
+            'application/json': {
+                'type': 'object',
+                'properties': {
+                    'role': {
+                        'type': 'string',
+                        'enum': ['client', 'admin', 'root']
+                    }
+                },
+                'required': ['role']
+            }
+        },
+        responses={
+            200: UserCustomSerializer,
+            400: OpenApiTypes.OBJECT,
+            403: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                'Cambiar a admin',
+                value={'role': 'admin'},
+                request_only=True,
+            ),
+        ]
+    )
     @action(detail=True, methods=['patch'], permission_classes=[IsAuthenticated])
     def change_user_role(self, request, pk=None):
         if request.user.role != 'root':
@@ -204,21 +434,16 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             'message': f'Rol cambiado exitosamente a {new_role}'
         })
     
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        
-        if request.user.role != 'root' and instance != request.user:
-            raise PermissionDenied(detail='Solo el usuario root puede borrar otros usuarios')
-        
-        if instance == request.user and request.user.role == 'root':
-            raise PermissionDenied(detail='El usuario root no puede borrarse a sí mismo')
-        
-        instance.delete(user=request.user)
-        
-        return Response({
-            'message': 'Usuario desactivado exitosamente'
-        }, status=status.HTTP_204_NO_CONTENT)
-    
+    @extend_schema(
+        summary="Eliminar usuario completamente",
+        description="Elimina permanentemente un usuario del sistema. Solo para root y admin.",
+        tags=["Usuarios"],
+        responses={
+            204: None,
+            403: OpenApiTypes.OBJECT,
+            404: OpenApiTypes.OBJECT,
+        },
+    )
     @action(detail=True, methods=['delete'], permission_classes=[IsAuthenticated])
     def hard_delete_user(self, request, pk=None):
         if request.user.role != 'root' and request.user.role != 'admin':
@@ -227,7 +452,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         
         if user == request.user:
-            raise PermissionDenied(detail='El usuario root no puede borrarse a sí mismo')
+            raise PermissionDenied(detail='No puedes eliminarte a ti mismo')
         
         try:
             user.hard_delete(user=request.user)
@@ -237,6 +462,17 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         except PermissionError as e:
             raise PermissionDenied(detail=str(e))
     
+    @extend_schema(
+        summary="Restaurar usuario",
+        description="Restaura un usuario previamente desactivado. Solo para admin y root.",
+        tags=["Usuarios"],
+        responses={
+            200: UserCustomSerializer,
+            400: OpenApiTypes.OBJECT,
+            403: OpenApiTypes.OBJECT,
+            404: OpenApiTypes.OBJECT,
+        },
+    )
     @action(detail=True, methods=['patch'], permission_classes=[IsAuthenticated])
     def restore_user(self, request, pk=None):
         if request.user.role not in ['admin', 'root']:
@@ -256,5 +492,3 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             'user': UserCustomSerializer(user).data,
             'message': 'Usuario restaurado exitosamente'
         })
-    
-    
