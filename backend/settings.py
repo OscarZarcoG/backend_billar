@@ -247,3 +247,22 @@ LOGGING = {
     },
     'root': {'handlers': ['console'], 'level': 'INFO'},
 }
+
+# ========================
+# 🌐 ALLAUTH: URLs y protocolo
+# ========================
+
+# Define el protocolo (Render usa HTTPS)
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
+# URL a la que Google redirige después del login correcto
+LOGIN_REDIRECT_URL = 'https://frontend-billar.onrender.com/'
+LOGOUT_REDIRECT_URL = 'https://frontend-billar.onrender.com/'
+
+ALLOWED_REDIRECT_HOSTS = ['frontend-billar.onrender.com']
+
+LOGIN_REDIRECT_URL = config(
+    'LOGIN_REDIRECT_URL',
+    default='https://frontend-billar.onrender.com/',
+)
+LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
