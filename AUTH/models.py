@@ -96,7 +96,8 @@ class UserCustom(AbstractUser, BaseModel):
         max_length=20,
         verbose_name="Teléfono",
         help_text="Teléfono",
-        null = False,
+        null=True,
+        blank=True,
         unique=True
     )
     image_profile = models.ImageField(
