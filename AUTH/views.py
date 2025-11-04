@@ -22,8 +22,48 @@ from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 
 @extend_schema(
     summary="Login social con Google",
-    description="Intercambia el token/código de Google por un usuario y token API",
+    description=(
+        "Intercambia el token o código de autorización de Google por un usuario y un token API. "
+        "Requiere un `access_token` o `code` válido obtenido del flujo OAuth2 de Google."
+    ),
     tags=["Social"],
+    request={
+        'application/json': {
+            'type': 'object',
+            'properties': {
+                'access_token': {'type': 'string', 'description': 'Token de acceso devuelto por Google'},
+                'code': {'type': 'string', 'description': 'Código de autorización (opcional, alternativa al access_token)'},
+            },
+            'example': {
+                'access_token': 'ya29.a0AVvZVsrExampleToken12345'
+            }
+        }
+    },
+    responses={
+        200: OpenApiTypes.OBJECT,
+        400: OpenApiTypes.OBJECT,
+    },
+    examples=[
+        OpenApiExample(
+            'Ejemplo de login social exitoso',
+            value={
+                'user': {
+                    'id': 1,
+                    'username': 'google_user',
+                    'email': 'user@gmail.com',
+                },
+                'token': 'a1b2c3d4e5f6'
+            },
+            response_only=True
+        ),
+        OpenApiExample(
+            'Ejemplo de error',
+            value={
+                'detail': 'Token inválido o expirado'
+            },
+            response_only=True
+        )
+    ]
 )
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
@@ -32,12 +72,53 @@ class GoogleLogin(SocialLoginView):
 
 @extend_schema(
     summary="Login social con GitHub",
-    description="Intercambia el token/código de GitHub por un usuario y token API",
+    description=(
+        "Intercambia el token o código de autorización de GitHub por un usuario y un token API. "
+        "Requiere un `access_token` o `code` válido obtenido del flujo OAuth2 de GitHub."
+    ),
     tags=["Social"],
+    request={
+        'application/json': {
+            'type': 'object',
+            'properties': {
+                'access_token': {'type': 'string', 'description': 'Token de acceso devuelto por GitHub'},
+                'code': {'type': 'string', 'description': 'Código de autorización (opcional, alternativa al access_token)'},
+            },
+            'example': {
+                'access_token': 'gho_ExampleGithubToken12345'
+            }
+        }
+    },
+    responses={
+        200: OpenApiTypes.OBJECT,
+        400: OpenApiTypes.OBJECT,
+    },
+    examples=[
+        OpenApiExample(
+            'Ejemplo de login social exitoso',
+            value={
+                'user': {
+                    'id': 1,
+                    'username': 'github_user',
+                    'email': 'user@github.com',
+                },
+                'token': 'z9y8x7w6v5u4'
+            },
+            response_only=True
+        ),
+        OpenApiExample(
+            'Ejemplo de error',
+            value={
+                'detail': 'Token inválido o expirado'
+            },
+            response_only=True
+        )
+    ]
 )
 class GitHubLogin(SocialLoginView):
     adapter_class = GitHubOAuth2Adapter
     client_class = OAuth2Client
+
 
 
 
