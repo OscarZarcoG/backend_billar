@@ -50,13 +50,26 @@ class EmailRequired(BaseAPIException):
     default_code = 'email_required'
     error_type = 'email_error'
 
+class PhoneInvalid(BaseAPIException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    default_detail = 'El tamaño del teléfono es menor a 10 dígitos.'
+    default_code = 'phone_invalid'
+    error_type = 'phone_error'
 
+class UserDoesNotExist(BaseAPIException):
+    status_code = status.HTTP_404_NOT_FOUND
+    default_detail = 'El usuario no existe.'
+    default_code = 'user_not_found'
+    error_type = 'not_found_error'
 
 class InvalidCredentials(BaseAPIException):
     status_code = status.HTTP_401_UNAUTHORIZED
     default_detail = 'Credenciales inválidas.'
     default_code = 'invalid_credentials'
     error_type = 'authentication_error'
+
+
+
 
 class SessionExpired(BaseAPIException):
     status_code = status.HTTP_401_UNAUTHORIZED
@@ -75,14 +88,6 @@ class TokenExpired(BaseAPIException):
     default_detail = 'Token expirado.'
     default_code = 'token_expired'
     error_type = 'authentication_error'
-
-
-
-class UserDoesNotExist(BaseAPIException):
-    status_code = status.HTTP_404_NOT_FOUND
-    default_detail = 'El usuario no existe...'
-    default_code = 'user_not_found'
-    error_type = 'not_found_error'
 
 
 

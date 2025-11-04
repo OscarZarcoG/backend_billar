@@ -9,9 +9,9 @@ from drf_spectacular.types import OpenApiTypes
 from .models import UserCustom
 from .serializers import UserCustomSerializer, LoginSerializer, UserRegistrationSerializer, UserRegistrationResponseSerializer, UserBasicSerializer
 from .exceptions import (
-    PasswordMismatch, PasswordRequired, UsernameRequired,
-    EmailAlreadyExists, UserAlreadyExists,
-    PermissionDenied, PasswordTooShort, EmailRequired
+    PasswordMismatch, PasswordRequired, UsernameRequired, UserDoesNotExist,
+    EmailAlreadyExists, UserAlreadyExists, InvalidCredentials,
+    PermissionDenied, PasswordTooShort, EmailRequired, PhoneInvalid
 )
 from core.exceptions import ValidationError, NotFoundError
 
@@ -86,6 +86,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         
         return super().partial_update(request, *args, **kwargs)
     
+    # Registro
     @extend_schema(
         summary="Registrar nuevo usuario",
         tags=["Autenticación"],
@@ -95,96 +96,57 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         },
         examples=[
             OpenApiExample(
-                'Ejemplo de registro',
+                'Ejemplo de registro client',
                 value={
-                        "username": "pedro_cliente",
-                        "first_name": "Pedro",
-                        "last_name": "Samano",
-                        "email": "pedro.samano@example.com",
-                        "password": "pedro123",
-                        "password_confirm": "pedro123",
-                        "phone": "987654321",
-                        "birthday": "2004-11-03",
+                        "username": "test_user_client",
+                        "first_name": "Test User",
+                        "last_name": "Client",
+                        "email": "test_user_client@example.com",
+                        "password": "test_user_client",
+                        "password_confirm": "test_user_client",
+                        "phone": "1234567890",
+                        "birthday": "2000-01-01",
                         "gender": "male",
-                        "role": "cliente"
+                        "role": "client"
                 },
                 request_only=True,
             ),
             OpenApiExample(
-                'Respuesta exitosa',
+                'Ejemplo de registro admin',
                 value={
-                    "user": {
-                        "id": 1,
-                        "username": "pedro_cliente",
-                        "first_name": "Pedro",
-                        "last_name": "Samano",
-                        "email": "pedro.samano@example.com",
-                        "phone": "987654321",
-                        "birthday": "2004-11-03",
-                        "gender": "male",
-                        "role": "cliente"
-                    },
-                    "token": "a1b2c3d4e5f6g7h8i9j0",
-                    "message": "Usuario registrado exitosamente"
+                    "username": "test_user_admin",
+                    "first_name": "Test User",
+                    "last_name": "Admin",
+                    "email": "test_user_admin@example.com",
+                    "password": "test_user_admin",
+                    "password_confirm": "test_user_admin",
+                    "phone": "0987654321",
+                    "birthday": "2000-01-01",
+                    "gender": "male",
+                    "role": "admin"
                 },
+                request_only=True,
             ),
             OpenApiExample(
-                'Errores de validación',
+                'Ejemplo de registro root',
                 value={
-                    'errors': {
-                        'username': [
-                            'Este campo es requerido.'
-                        ],
-                        'email': [
-                            'Este campo es requerido.'
-                        ],
-                        'password': [
-                            'Este campo es requerido.'
-                        ],
-                        'password_confirm': [
-                            'Este campo es requerido.'
-                        ]
-                    }
+                    "username": "test_user_root",
+                    "first_name": "Test User",
+                    "last_name": "Root",
+                    "email": "test_user_root@example.com",
+                    "password": "test_user_root",
+                    "password_confirm": "test_user_root",
+                    "phone": "1357924680",
+                    "birthday": "2000-01-01",
+                    "gender": "male",
+                    "role": "root"
                 },
-                response_only=True,
+                request_only=True,
             )
         ]
     )
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
     def register(self, request):
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
-        password_confirm = request.data.get('password_confirm')
-        
-        # El nombre de usuario es requerido
-        if not username or username.strip() == '':
-            raise UsernameRequired()
-        
-        # El email es requerido
-        if not email or email.strip() == '':
-            raise EmailRequired()
-        
-        # Contraseña es requerida
-        if not password or password.strip() == '':
-            raise PasswordRequired()
-        
-        # El usuario ya está registrado
-        if username and UserCustom.objects.filter(username=username).exists():
-            raise UserAlreadyExists()
-        
-        # El email ya está registrado
-        if email and UserCustom.objects.filter(email=email).exists():
-            raise EmailAlreadyExists()
-        
-        # Tamaño de contraseña 
-        if password and len(password.strip()) < 8:
-            raise PasswordTooShort()
-        
-        # Confirmación de contraseñas iguales
-        if password and password_confirm and password != password_confirm:
-            raise PasswordMismatch()
-        
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
@@ -200,38 +162,40 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
     
+    
+    # Login
     @extend_schema(
         summary="Iniciar sesión",
-        description="Autentica un usuario y retorna un token de acceso",
         tags=["Autenticación"],
         request=LoginSerializer,
         responses={
-            200: OpenApiTypes.OBJECT,
-            400: OpenApiTypes.OBJECT,
+            200: LoginSerializer,
         },
         examples=[
             OpenApiExample(
-                'Ejemplo de login',
+                'Ejemplo de login client',
                 value={
-                    'username': 'mi_usuario',
-                    'password': 'mi_password'
+                    'username': 'test_user_client',
+                    'password': 'test_user_client'
                 },
                 request_only=True,
             ),
             OpenApiExample(
-                'Respuesta exitosa',
+                'Ejemplo de login admin',
                 value={
-                    'user': {
-                        'id': 1,
-                        'username': 'mi_usuario',
-                        'email': 'usuario@example.com',
-                        'role': 'client'
-                    },
-                    'token': 'a1b2c3d4e5f6g7h8i9j0',
-                    'message': 'Login exitoso'
+                    'username': 'test_user_admin',
+                    'password': 'test_user_admin'
                 },
-                response_only=True,
+                request_only=True,
             ),
+            OpenApiExample(
+                'Ejemplo de login root',
+                value={
+                    'username': 'test_user_root',
+                    'password': 'test_user_root'
+                },
+                request_only=True,
+            )
         ]
     )
     @action(detail=False, methods=['post'], permission_classes=[AllowAny])
@@ -251,23 +215,14 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
     
+    
+    # Logout
     @extend_schema(
         summary="Cerrar sesión",
-        description="Invalida el token de autenticación del usuario actual",
         tags=["Autenticación"],
-        responses={
-            200: OpenApiTypes.OBJECT,
-            400: OpenApiTypes.OBJECT,
-        },
-        examples=[
-            OpenApiExample(
-                'Respuesta exitosa',
-                value={
-                    'message': 'Logout exitoso'
-                },
-                response_only=True,
-            ),
-        ]
+        responses=None,
+        request=None,
+        examples=[],
     )
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
     def logout(self, request):
@@ -281,6 +236,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
                 detail='Error al cerrar sesión',
                 meta={'error_details': str(e)}
             )
+    
     
     @extend_schema(
         summary="Obtener perfil actual",
@@ -517,15 +473,12 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         if request.user.role not in ['admin', 'root']:
             raise PermissionDenied(detail='Solo administradores y root pueden restaurar usuarios')
         
-        try:
-            user = UserCustom.objects.all_objects().get(pk=pk)
-        except UserCustom.DoesNotExist:
-            raise NotFoundError(detail='Usuario no encontrado')
+        user = self.get_object()
+        if user.is_active:
+            raise ValidationError(detail='El usuario ya está activo')
         
-        if not user.is_deleted:
-            raise ValidationError(detail='El usuario no está borrado')
-        
-        user.restore()
+        user.is_active = True
+        user.save()
         
         return Response({
             'user': UserCustomSerializer(user).data,
