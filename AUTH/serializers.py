@@ -2,6 +2,11 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import UserCustom
+from .exceptions import (
+    PasswordMismatch, PasswordRequired, UsernameRequired, EmailRequired,
+    UserAlreadyExists, EmailAlreadyExists, PasswordTooShort, PhoneInvalid,
+    InvalidCredentials, UserDoesNotExist, PermissionDenied
+)
 
 class UserRegistrationResponseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -70,27 +75,30 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     
     def validate(self, attrs):
-        username = attrs.get('username')
-        password = attrs.get('password')
+        username = (attrs.get('username') or '').strip()
+        password = (attrs.get('password') or '').strip()
         
-        if username and password:
-            user = authenticate(username=username, password=password)
-            if not user:
-                try:
-                    user_obj = UserCustom.objects.get(email=username)
-                    user = authenticate(username=user_obj.username, password=password)
-                except UserCustom.DoesNotExist:
-                    pass
-            
-            if user:
-                if not user.is_active:
-                    raise serializers.ValidationError('La cuenta está desactivada.')
-                attrs['user'] = user
-                return attrs
-            else:
-                raise serializers.ValidationError('Credenciales inválidas.')
-        else:
-            raise serializers.ValidationError('Debe proporcionar username/email y password.')
+        if not username:
+            raise UsernameRequired()
+        if not password:
+            raise PasswordRequired()
+        
+        user = authenticate(username=username, password=password)
+        if not user:
+            try:
+                user_obj = UserCustom.objects.get(email=username)
+                user = authenticate(username=user_obj.username, password=password)
+            except UserCustom.DoesNotExist:
+                raise UserDoesNotExist()
+        
+        if not user:
+            raise InvalidCredentials()
+        
+        if not user.is_active:
+            raise PermissionDenied(detail='La cuenta está desactivada.')
+        
+        attrs['user'] = user
+        return attrs
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
@@ -112,8 +120,46 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
         
     def validate(self, attrs):
-        if attrs['password'] != attrs['password_confirm']:
-            raise serializers.ValidationError("Las contraseñas no coinciden")
+        username = (attrs.get('username') or '').strip()
+        email = (attrs.get('email') or '').strip()
+        password = (attrs.get('password') or '').strip()
+        password_confirm = (attrs.get('password_confirm') or '').strip()
+        phone = attrs.get('phone')
+        phone_str = (str(phone).strip() if phone is not None else None)
+
+        # Requeridos
+        if not username:
+            raise UsernameRequired()
+        if not email:
+            raise EmailRequired()
+        if not password:
+            raise PasswordRequired()
+
+        # Unicidad
+        if UserCustom.objects.filter(username=username).exists():
+            raise UserAlreadyExists()
+        if UserCustom.objects.filter(email=email).exists():
+            raise EmailAlreadyExists()
+
+        # Seguridad contraseña
+        if len(password) < 8:
+            raise PasswordTooShort()
+
+        # Confirmación de contraseña
+        if password_confirm and password != password_confirm:
+            raise PasswordMismatch()
+
+        # Validación de teléfono
+        if phone_str and len(phone_str) < 10:
+            raise PhoneInvalid()
+
+        # Normalización
+        attrs['username'] = username
+        attrs['email'] = email
+        attrs['password'] = password
+        attrs['password_confirm'] = password_confirm
+        if phone is not None:
+            attrs['phone'] = phone_str
         return attrs
     
     def create(self, validated_data):

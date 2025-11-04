@@ -1,0 +1,258 @@
+:root {
+  --blue: #007aff;
+  --green: #34c759;
+  --orange: #ff9500;
+  --red: #ff3b30;
+  --purple: #af52de;
+
+  --gray-light: #f2f2f7;
+  --gray-mid: #e5e5ea;
+  --gray-dark: #1d1d1f;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+
+  --glass-bg-light: rgba(255, 255, 255, 0.4);
+  --glass-bg-dark: rgba(30, 30, 30, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.3);
+
+  --shadow-soft: 0 20px 40px rgba(0, 0, 0, 0.1);
+  --blur: blur(40px);
+
+  --radius: 22px;
+  --extra-radius: 40px;
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'SF Mono', ui-monospace, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+}
+
+/* RESET */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-system);
+  color: var(--text-primary);
+  background: radial-gradient(circle at 30% 70%, #cdd4e0 0%, #cdd4e0 100%);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+  overflow-x: hidden;
+  padding: 40px;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1), transparent 70%),
+              radial-gradient(circle at 80% 20%, rgba(255,255,255,0.08), transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Contenedor */
+#swagger-ui {
+  max-width: 1300px;
+  margin: 0 auto;
+  background: var(--glass-bg-light);
+  backdrop-filter: var(--blur) saturate(180%);
+  -webkit-backdrop-filter: var(--blur) saturate(180%);
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+#swagger-ui::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(145deg, rgba(255,255,255,0.25), rgba(255,255,255,0.05));
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* Topbar */
+.swagger-ui .topbar {
+  background: rgba(209, 127, 231, 0.6);
+  backdrop-filter: blur(25px);
+  border-radius: var(--radius) var(--radius) 0 0;
+  border-bottom: 1px solid var(--glass-border);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.swagger-ui .topbar .download-url-wrapper input {
+  border-radius: 14px;
+  border: 1px solid var(--gray-mid);
+  background: rgba(255,255,255,0.8);
+  padding: 10px 16px;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 1px rgba(255,255,255,0.5);
+}
+
+/* Info section */
+.swagger-ui .info {
+  margin-top: 40px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 2px rgba(255,255,255,0.4), var(--shadow-soft);
+}
+
+.swagger-ui .info .title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  color: var(--blue);
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.swagger-ui .info .description {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+/* Filter */
+.swagger-ui .filter-container {
+  margin-top: 32px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+}
+
+.swagger-ui .filter input[type=text] {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--gray-mid);
+  font-size: 1rem;
+  background: rgba(255,255,255,0.9);
+}
+
+/* Tags section */
+.swagger-ui .opblock-tag {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.7);
+  border-radius: var(--radius);
+  border: 1px solid var(--glass-border);
+  padding: 16px 20px;
+  box-shadow: var(--shadow-soft);
+}
+
+.swagger-ui .opblock-tag h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Operations */
+.swagger-ui .opblock {
+  border: 1px solid var(--gray-mid);
+  border-radius: var(--radius);
+  background: rgba(255,255,255,0.9);
+  margin: 12px 0;
+  box-shadow: var(--shadow-soft);
+}
+
+.swagger-ui .opblock-summary {
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.swagger-ui .opblock-summary-method {
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  color: white;
+  text-transform: uppercase;
+}
+
+.swagger-ui .opblock-get .opblock-summary-method { background: var(--green); border-radius: var(--extra-radius); }
+.swagger-ui .opblock-post .opblock-summary-method { background: var(--blue); border-radius: var(--extra-radius); }
+.swagger-ui .opblock-put .opblock-summary-method { background: var(--orange); border-radius: var(--extra-radius); }
+.swagger-ui .opblock-delete .opblock-summary-method { background: var(--red); border-radius: var(--extra-radius); }
+.swagger-ui .opblock-patch .opblock-summary-method { background: var(--purple); border-radius: var(--extra-radius); }
+
+/* Buttons */
+.swagger-ui .btn {
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-weight: 600;
+  border: none;
+  transition: all 0.25s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.swagger-ui .btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+.swagger-ui .btn.execute {
+  background: linear-gradient(135deg, var(--blue), #0051d5);
+  color: white;
+}
+
+.swagger-ui .btn.cancel {
+  background: var(--gray-mid);
+  color: var(--text-primary);
+}
+
+/* Forms */
+.swagger-ui input,
+.swagger-ui select,
+.swagger-ui textarea {
+  border-radius: 14px;
+  border: 1px solid var(--gray-mid);
+  background: rgba(255,255,255,0.9);
+  padding: 10px 14px;
+  font-size: 1rem;
+  font-family: var(--font-system);
+}
+
+/* Tables */
+.swagger-ui table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.swagger-ui table th,
+.swagger-ui table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--gray-mid);
+}
+
+.swagger-ui table th {
+  background: var(--gray-light);
+  font-weight: 600;
+  text-align: left;
+  color: var(--text-primary);
+}
+
+/* Code blocks */
+.swagger-ui pre, .swagger-ui code {
+  color: #f5f5f7;
+  border-radius: 14px;
+  padding: 14px 20px;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
