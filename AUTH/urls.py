@@ -1,6 +1,6 @@
 # AUTH/urls.py
 from django.urls import path
-from .views import UserCustomViewSet
+from .views import UserCustomViewSet, GoogleLogin, GitHubLogin
 
 urlpatterns = [
     path('auth/register/', UserCustomViewSet.as_view({'post': 'register'}), name='auth-register'),
@@ -22,4 +22,8 @@ urlpatterns = [
     path('auth/<int:pk>/change-user-role/', UserCustomViewSet.as_view({'patch': 'change_user_role'}), name='auth-change-user-role'),
     path('auth/<int:pk>/hard-delete/', UserCustomViewSet.as_view({'delete': 'hard_delete_user'}), name='auth-hard-delete'),
     path('auth/<int:pk>/restore/', UserCustomViewSet.as_view({'patch': 'restore_user'}), name='auth-restore'),
+
+    # Social login endpoints (Google, GitHub)
+    path('auth/social/google/', GoogleLogin.as_view(), name='auth-social-google'),
+    path('auth/social/github/', GitHubLogin.as_view(), name='auth-social-github'),
 ]

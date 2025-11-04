@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
 
     # Dependencias externas
     'corsheaders',
@@ -35,6 +36,13 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'drf_spectacular',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
 
     # Apps locales
     'AUTH',
@@ -51,6 +59,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -100,6 +109,31 @@ else:
 # 🔐 AUTENTICACIÓN
 # ========================
 AUTH_USER_MODEL = 'AUTH.UserCustom'
+
+# Backends de autenticación: Django + Allauth
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Sites framework (requerido por django-allauth)
+SITE_ID = config('SITE_ID', default=1, cast=int)
+
+# Configuración de cuentas (django-allauth)
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email'
+ACCOUNT_ADAPTER = 'allauth.account.adapter.DefaultAccountAdapter'
+
+# Configuración de social accounts (se usan SocialApp en DB con credenciales)
+SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
+SOCIALACCOUNT_STORE_TOKENS = True
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_QUERY_EMAIL = True
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -185,6 +219,7 @@ SPECTACULAR_SETTINGS = {
         {'name': 'Autenticación', 'description': 'Login, registro y logout'},
         {'name': 'Usuarios', 'description': 'Gestión de usuarios y perfiles'},
         {'name': 'Roles', 'description': 'Gestión de roles y permisos'},
+        {'name': 'Social', 'description': 'Login social (Google, GitHub)'},
     ],
     'SERVERS': [
         {'url': 'http://localhost:8000', 'description': 'Desarrollo'},
