@@ -5,6 +5,27 @@ from django.utils.html import format_html
 from django.urls import reverse
 from django.utils.safestring import mark_safe
 from .models import UserCustom
+from allauth.socialaccount.models import SocialAccount
+
+
+class SocialProviderFilter(admin.SimpleListFilter):
+    title = 'Origen'
+    parameter_name = 'origen'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('local', 'Local'),
+            ('google', 'Google'),
+            ('github', 'GitHub'),
+        ]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value == 'local':
+            return queryset.filter(socialaccount__isnull=True)
+        if value in ('google', 'github'):
+            return queryset.filter(socialaccount__provider=value)
+        return queryset
 
 
 @admin.register(UserCustom)
@@ -17,6 +38,7 @@ class UserCustomAdmin(UserAdmin):
         'phone',
         'role',
         'gender',
+        'login_origin',
         'is_active',
         'is_staff',
         'created_at',
@@ -32,6 +54,7 @@ class UserCustomAdmin(UserAdmin):
         'is_superuser',
         'created_at',
         'updated_at',
+        SocialProviderFilter,
     )
     
     # Campos de búsqueda
@@ -152,6 +175,14 @@ class UserCustomAdmin(UserAdmin):
             )
         return "Sin imagen"
     profile_image_preview.short_description = 'Vista Previa'
+
+    def login_origin(self, obj):
+        """Muestra el origen de autenticación (Local/Google/GitHub)"""
+        providers = list(obj.socialaccount_set.values_list('provider', flat=True))
+        if not providers:
+            return 'Local'
+        return ', '.join(p.capitalize() for p in providers)
+    login_origin.short_description = 'Origen'
     
     # Acciones personalizadas
     actions = ['activate_users', 'deactivate_users', 'make_admin', 'make_client']
@@ -196,7 +227,7 @@ class UserCustomAdmin(UserAdmin):
     def get_queryset(self, request):
         """Optimiza las consultas incluyendo campos relacionados"""
         qs = super().get_queryset(request)
-        return qs.select_related().prefetch_related('groups', 'user_permissions')
+        return qs.select_related().prefetch_related('groups', 'user_permissions', 'socialaccount_set')
     
     # Personalizar permisos
     def has_delete_permission(self, request, obj=None):
