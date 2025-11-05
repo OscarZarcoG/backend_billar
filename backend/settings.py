@@ -252,17 +252,13 @@ LOGGING = {
 # 🌐 ALLAUTH: URLs y protocolo
 # ========================
 
-# Define el protocolo (Render usa HTTPS)
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
-
-# URL a la que Google redirige después del login correcto
-LOGIN_REDIRECT_URL = 'https://frontend-billar.onrender.com/'
-LOGOUT_REDIRECT_URL = 'https://frontend-billar.onrender.com/'
-
-ALLOWED_REDIRECT_HOSTS = ['frontend-billar.onrender.com']
-
-LOGIN_REDIRECT_URL = config(
-    'LOGIN_REDIRECT_URL',
-    default='https://frontend-billar.onrender.com/',
-)
-LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
+if DEBUG:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
+    LOGIN_REDIRECT_URL = 'http://localhost:3000/'
+    LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
+    ALLOWED_REDIRECT_HOSTS = ['localhost', '127.0.0.1']
+else:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+    LOGIN_REDIRECT_URL = 'https://frontend-billar.onrender.com/'
+    LOGOUT_REDIRECT_URL = 'https://frontend-billar.onrender.com/'
+    ALLOWED_REDIRECT_HOSTS = ['frontend-billar.onrender.com']
