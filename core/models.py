@@ -37,14 +37,12 @@ class BaseModel(models.Model):
 
     def delete(self, hard_delete=False, **kwargs):
         if hard_delete:
-            # Filtrar kwargs para solo pasar los argumentos que acepta Django Model.delete()
             django_delete_kwargs = {k: v for k, v in kwargs.items() if k in ['using']}
             return super().delete(**django_delete_kwargs)
         self.deleted_at = timezone.now()
         self.save()
 
     def hard_delete(self, **kwargs):
-        # Filtrar kwargs para solo pasar los argumentos que acepta Django Model.delete()
         django_delete_kwargs = {k: v for k, v in kwargs.items() if k in ['using']}
         return self.delete(hard_delete=True, **django_delete_kwargs)
 

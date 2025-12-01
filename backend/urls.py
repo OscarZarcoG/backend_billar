@@ -10,6 +10,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, Sp
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('AUTH.urls')),
+    path('api/', include('CLIENTS.urls')),
     # Rutas de callback de allauth (proveedores sociales)
     path('accounts/', include('allauth.urls')),
     # URLs para documentación OpenAPI/Swagger

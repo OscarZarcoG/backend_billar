@@ -1,4 +1,3 @@
-# backend/settings.py
 import os
 from pathlib import Path
 from decouple import config
@@ -6,9 +5,7 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ========================
-# ⚙️ CONFIGURACIÓN BÁSICA
-# ========================
+# B A S I C   C O N F I G U R A T I O N
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-key')
 DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config(
@@ -17,11 +14,8 @@ ALLOWED_HOSTS = config(
     cast=lambda v: [s.strip() for s in v.split(',')]
 )
 
-# ========================
-# 📦 APLICACIONES
-# ========================
+# A P P L I C A T I O N S
 INSTALLED_APPS = [
-    # Django core
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,12 +23,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-
-    # Dependencias externas
+    
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
-    'django_filters',
     'drf_spectacular',
     'dj_rest_auth',
     'dj_rest_auth.registration',
@@ -43,14 +35,13 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
-
-    # Apps locales
+    
     'AUTH',
+    'CLIENTS',
+    'core',
 ]
 
-# ========================
-# 🧩 MIDDLEWARE
-# ========================
+# M I D D L E W A R E
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
@@ -66,9 +57,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'backend.urls'
 
-# ========================
-# 🧠 TEMPLATES
-# ========================
+# T E M P L A T E S
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -87,9 +76,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 ASGI_APPLICATION = 'backend.asgi.application'
 
-# ========================
-# 🗄️ BASE DE DATOS
-# ========================
+# D A T A B A S E
 DATABASE_URL = config('DATABASE_URL', default=None)
 if DATABASE_URL:
     DATABASES = {'default': dj_database_url.parse(DATABASE_URL)}
@@ -105,21 +92,16 @@ else:
         }
     }
 
-# ========================
-# 🔐 AUTENTICACIÓN
-# ========================
+# A U T H E N T I C A T I O N
 AUTH_USER_MODEL = 'AUTH.UserCustom'
 
-# Backends de autenticación: Django + Allauth
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-# Sites framework (requerido por django-allauth)
 SITE_ID = config('SITE_ID', default=1, cast=int)
 
-# Configuración de cuentas (django-allauth)
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -129,7 +111,6 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email'
 ACCOUNT_ADAPTER = 'AUTH.adapters.CustomAccountAdapter'
 
-# Configuración de social accounts (se usan SocialApp en DB con credenciales)
 SOCIALACCOUNT_ADAPTER = 'allauth.socialaccount.adapter.DefaultSocialAccountAdapter'
 SOCIALACCOUNT_STORE_TOKENS = True
 SOCIALACCOUNT_EMAIL_REQUIRED = True
@@ -142,17 +123,13 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ========================
-# 🌍 INTERNACIONALIZACIÓN
-# ========================
-LANGUAGE_CODE = 'es-mx'
-TIME_ZONE = 'America/Mexico_City'
+# I N T E R N A T I O N A L I Z A T I O N
+LANGUAGE_CODE = 'en-us'
+TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# ========================
-# 🧾 ARCHIVOS ESTÁTICOS / MEDIA
-# ========================
+# S T A T I C   F I L E S
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
@@ -166,9 +143,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ========================
-# 🌐 CORS
-# ========================
+# C O R S
 CORS_ALLOWED_ORIGINS = config(
     'CORS_ALLOWED_ORIGINS',
     default='http://localhost:3000,http://127.0.0.1:3000',
@@ -176,9 +151,7 @@ CORS_ALLOWED_ORIGINS = config(
 )
 CORS_ALLOW_CREDENTIALS = True
 
-# ========================
-# ⚙️ REST FRAMEWORK
-# ========================
+# R E S T   F R A M E W O R K
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
@@ -189,19 +162,18 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# ========================
-# 🧭 SPECTACULAR (Swagger)
-# ========================
+# D J - R E S T - A U T H
+REST_AUTH = {
+    'REGISTER_SERIALIZER': 'AUTH.serializers.CustomRegisterSerializer',
+    'USER_DETAILS_SERIALIZER': 'AUTH.serializers.UserCustomSerializer',
+    'TOKEN_MODEL': 'rest_framework.authtoken.models.Token',
+    'USE_JWT': False,
+}
+
+# A P I   D O C U M E N T A T I O N
 SPECTACULAR_SETTINGS = {
     'TITLE': 'PoolZapp API',
-    'DESCRIPTION': '''
-    ## Sistema de Gestión de Billar
-    
-    API RESTful con:
-    - Autenticación por token
-    - Roles y permisos
-    - Soft delete y restauración
-    ''',
+    'DESCRIPTION': 'RESTful API with token authentication, roles and permissions',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'SWAGGER_UI_SETTINGS': {
@@ -216,20 +188,17 @@ SPECTACULAR_SETTINGS = {
         'syntaxHighlight.theme': 'monokai',
     },
     'TAGS': [
-        {'name': 'Autenticación', 'description': 'Login, registro y logout'},
-        {'name': 'Usuarios', 'description': 'Gestión de usuarios y perfiles'},
-        {'name': 'Roles', 'description': 'Gestión de roles y permisos'},
-        {'name': 'Social', 'description': 'Login social (Google, GitHub)'},
+        {'name': 'Authentication', 'description': 'Login, registration and logout'},
+        {'name': 'Users', 'description': 'User management'},
+        {'name': 'Roles', 'description': 'Role management'},
+        {'name': 'Social Authentication', 'description': 'Social login (Google, GitHub)'},
     ],
     'SERVERS': [
-        {'url': 'http://localhost:8000', 'description': 'Desarrollo'},
-        {'url': 'https://backend-billar.onrender.com', 'description': 'Producción'},
+        {'url': 'http://localhost:8000', 'description': 'Development'},
     ],
 }
 
-# ========================
-# 🪵 LOGGING
-# ========================
+# L O G G I N G
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -248,21 +217,18 @@ LOGGING = {
     'root': {'handlers': ['console'], 'level': 'INFO'},
 }
 
-# ========================
-# 🌐 ALLAUTH: URLs y protocolo
-# ========================
-
-# Define el protocolo (Render usa HTTPS)
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
-
-# URL a la que Google redirige después del login correcto
-LOGIN_REDIRECT_URL = 'https://frontend-billar.onrender.com/'
-LOGOUT_REDIRECT_URL = 'https://frontend-billar.onrender.com/'
-
-ALLOWED_REDIRECT_HOSTS = ['frontend-billar.onrender.com']
-
-LOGIN_REDIRECT_URL = config(
-    'LOGIN_REDIRECT_URL',
-    default='https://frontend-billar.onrender.com/',
-)
-LOGOUT_REDIRECT_URL = LOGIN_REDIRECT_URL
+# R E D I R E C T   U R L S
+if DEBUG:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'http'
+    LOGIN_REDIRECT_URL = 'http://localhost:3000/'
+    LOGOUT_REDIRECT_URL = 'http://localhost:3000/'
+    ALLOWED_REDIRECT_HOSTS = ['localhost', '127.0.0.1']
+else:
+    ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+    LOGIN_REDIRECT_URL = config('LOGIN_REDIRECT_URL', default='https://yourdomain.com/')
+    LOGOUT_REDIRECT_URL = config('LOGOUT_REDIRECT_URL', default='https://yourdomain.com/')
+    ALLOWED_REDIRECT_HOSTS = config(
+        'ALLOWED_REDIRECT_HOSTS',
+        default='yourdomain.com',
+        cast=lambda v: [s.strip() for s in v.split(',')]
+    )

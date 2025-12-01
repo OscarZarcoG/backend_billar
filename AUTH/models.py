@@ -10,9 +10,6 @@ class UserCustomManager(BaseManager, UserManager):
         return super(UserManager, self).get_queryset().filter(deleted_at__isnull=True)
     
     def _create_user(self, username, email, password, **extra_fields):
-        """
-        Create and save a user with the given username, email, and password.
-        """
         if not username:
             raise ValueError('The given username must be set')
         email = self.normalize_email(email)
@@ -44,7 +41,7 @@ class UserCustomManager(BaseManager, UserManager):
 class UserCustom(AbstractUser, BaseModel):
     objects = UserCustomManager()
     
-    # Override groups and user_permissions with custom related_name to avoid conflicts
+
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name='groups',
@@ -61,123 +58,79 @@ class UserCustom(AbstractUser, BaseModel):
         related_name='custom_user_set',
         related_query_name='custom_user',
     )
-    username = models.CharField(
-        max_length=50,
-        unique=True,
-        verbose_name="Nombre de usuario",
-        help_text="Nombre de usuario",
-        null=False
-    )
-    first_name = models.CharField(
-        max_length=50,
-        verbose_name="Nombres",
-        help_text="Nombres",
-        null = False
-    )
-    last_name = models.CharField(
-        max_length=50,
-        verbose_name="Apellidos",
-        help_text="Apellidos",
-        null = False
-    )
+
+
     email = models.EmailField(
-        max_length=255,
-        verbose_name="Email",
-        help_text="Email",
-        null=False
+        'email address',
+        unique=True, 
+        error_messages={
+            'unique': "A user with that email already exists.",
+        }
     )
-    password = models.CharField(
-        max_length=255,
-        verbose_name="Password",
-        help_text="Password",
-        null=False
-    )
+
     phone = models.CharField(
         max_length=20,
-        verbose_name="Teléfono",
-        help_text="Teléfono",
+        verbose_name="Phone",
         null=True,
         blank=True,
         unique=True
     )
     image_profile = models.ImageField(
         upload_to='profile_pictures/',
-        verbose_name="Imagen de perfil",
-        help_text="Imagen de perfil",
+        verbose_name="Profile Picture",
         null=True,
         blank=True
     )
     birthday = models.DateField(
-        verbose_name="Fecha de nacimiento",
-        help_text="Fecha de nacimiento",
+        verbose_name="Birthday",
         null=True,
         blank=True,
     )
+    
     GENDER_CHOICES = [
-        ('male', 'Masculino'),
-        ('female', 'Femenino'),
-        ('other', 'Otro'),
+        ('male', 'Male'),
+        ('female', 'Female'),
+        ('other', 'Other'),
     ]
     gender = models.CharField(
         max_length=10,
         choices=GENDER_CHOICES,
-        verbose_name="Genero",
-        help_text="Genero",
+        verbose_name="Gender",
         null=True,
         blank=True,
     )
     
     ROLE_CHOICES = [
         ('root', 'Root'),
-        ('admin', 'Administrador'),
-        ('client', 'Cliente'),
+        ('admin', 'Administrator'),
+        ('client', 'Client'),
     ]
     role = models.CharField(
         max_length=50,
         choices=ROLE_CHOICES,
         default='client',
-        verbose_name="Rol",
+        verbose_name="Role",
         db_index=True,
-        help_text="Rol del usuario"
     )
     
     def delete(self, hard_delete=False, **kwargs):
-        """
-        Sobrescribe el método delete para manejar el soft delete
-        y actualizar el campo is_active de Django
-        """
-        if hard_delete:
-            # Filtrar kwargs para solo pasar los argumentos que acepta Django Model.delete()
-            django_delete_kwargs = {k: v for k, v in kwargs.items() if k in ['using']}
-            return super(BaseModel, self).delete(**django_delete_kwargs)
+        super().delete(hard_delete=hard_delete, **kwargs)
         
-        # Soft delete: establecer deleted_at y desactivar el usuario
-        self.deleted_at = timezone.now()
-        self.is_active = False  # Desactivar el usuario en Django
-        self.save()
+        if not hard_delete:
+            self.is_active = False
+            self.save(update_fields=['is_active'])
 
     def restore(self):
-        """
-        Restaura un usuario eliminado con soft delete
-        """
-        self.deleted_at = None
-        self.is_active = True  # Reactivar el usuario en Django
-        self.save()
+        super().restore()
+        self.is_active = True
+        self.save(update_fields=['is_active'])
     
     def save(self, *args, **kwargs):
-        """
-        Sobrescribe el método save para establecer automáticamente
-        is_staff e is_superuser según el rol del usuario
-        """
         if not hasattr(self, '_skip_role_permissions'):
-            # Establecer permisos según el rol
-            if self.role == 'root':
+            if self.role in ['root', 'admin']:
                 self.is_staff = True
                 self.is_superuser = True
-            elif self.role == 'admin':
-                self.is_staff = True
-                self.is_superuser = False
-            else:  # role == 'client'
+            else:
                 self.is_staff = False
                 self.is_superuser = False
         
@@ -187,6 +140,6 @@ class UserCustom(AbstractUser, BaseModel):
         return f"{self.first_name} {self.last_name} ({self.username})"
     
     class Meta:
-        verbose_name = "Usuario"
-        verbose_name_plural = "Usuarios"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
         ordering = ['-created_at']

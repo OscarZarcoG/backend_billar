@@ -1,15 +1,12 @@
-# AUTH/apps.py
 from django.apps import AppConfig
 
 
 class AuthConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'AUTH'
-    verbose_name = 'Autenticación'
+    verbose_name = 'Authentication'
     
     def ready(self):
-        # Crear/actualizar SocialApp para proveedores si hay credenciales en entorno
-        # Evita fallos durante migraciones iniciales con try/except.
         import os
         from django.conf import settings
         try:
@@ -23,7 +20,6 @@ class AuthConfig(AppConfig):
             site_id = getattr(settings, 'SITE_ID', 1)
             site = Site.objects.get(pk=site_id)
         except (OperationalError, ProgrammingError, Exception):
-            # DB no lista aún; salir silenciosamente
             return
 
         providers = [
@@ -63,5 +59,4 @@ class AuthConfig(AppConfig):
                 if site not in app.sites.all():
                     app.sites.add(site)
             except (OperationalError, ProgrammingError):
-                # DB no lista aún; ignorar
                 continue
