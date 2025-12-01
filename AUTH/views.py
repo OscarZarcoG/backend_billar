@@ -1,9 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.hashers import check_password
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from dj_rest_auth.registration.views import SocialLoginView
@@ -53,45 +51,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
     serializer_class = UserCustomSerializer
     permission_classes = [IsAuthenticated]
     
-    @extend_schema(
-        summary="Change password",
-        tags=["Users"],
-        request={
-            'application/json': {
-                'type': 'object',
-                'properties': {
-                    'old_password': {'type': 'string'},
-                    'new_password': {'type': 'string'},
-                },
-                'required': ['old_password', 'new_password']
-            }
-        },
-        responses={200: OpenApiTypes.OBJECT, 400: OpenApiTypes.OBJECT},
-    )
-    @action(detail=False, methods=['post'])
-    def change_password(self, request):
-        old_password = request.data.get('old_password')
-        new_password = request.data.get('new_password')
-        
-        if not old_password or not new_password:
-            raise ValidationError(detail='Both passwords are required')
-        
-        if not check_password(old_password, request.user.password):
-            raise ValidationError(detail='Current password is incorrect')
-        
-        request.user.set_password(new_password)
-        request.user.save()
-        
-        try:
-            request.user.auth_token.delete()
-        except:
-            pass
-        token = Token.objects.create(user=request.user)
-        
-        return Response({
-            'message': 'Password changed successfully',
-            'token': token.key
-        })
+    
     
     @extend_schema(
         summary="Filter users by role",
@@ -160,7 +120,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             raise PermissionDenied(detail='Cannot delete yourself')
         
         try:
-            user.hard_delete(user=request.user)
+            user.hard_delete()
             return Response({'message': 'User deleted permanently'}, status=status.HTTP_204_NO_CONTENT)
         except PermissionError as e:
             raise PermissionDenied(detail=str(e))

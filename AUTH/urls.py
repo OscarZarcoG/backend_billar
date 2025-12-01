@@ -24,5 +24,4 @@ urlpatterns = [
     path('auth/users/<int:pk>/change-role/', UserCustomViewSet.as_view({'patch': 'change_user_role'}), name='change-role'),
     path('auth/users/<int:pk>/hard-delete/', UserCustomViewSet.as_view({'delete': 'hard_delete_user'}), name='hard-delete'),
     path('auth/users/<int:pk>/restore/', UserCustomViewSet.as_view({'patch': 'restore_user'}), name='restore-user'),
-    path('auth/users/change-password/', UserCustomViewSet.as_view({'post': 'change_password'}), name='change-password'),
 ]

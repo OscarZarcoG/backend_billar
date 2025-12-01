@@ -51,10 +51,6 @@ class BaseModel(models.Model):
         self.save()
 
     @property
-    def is_active(self):
-        return not self.is_deleted
-
-    @property
     def is_deleted(self):
         return self.deleted_at is not None
 
