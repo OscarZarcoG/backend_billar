@@ -35,9 +35,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'allauth.socialaccount.providers.github',
-    
     'AUTH',
-    'CLIENTS',
     'core',
 ]
 
@@ -105,7 +103,7 @@ SITE_ID = config('SITE_ID', default=1, cast=int)
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_EMAIL_VERIFICATION = 'none' if DEBUG else 'mandatory'
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
 ACCOUNT_USER_MODEL_EMAIL_FIELD = 'email'
@@ -158,6 +156,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
+        #'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
@@ -167,6 +166,7 @@ REST_AUTH = {
     'REGISTER_SERIALIZER': 'AUTH.serializers.CustomRegisterSerializer',
     'USER_DETAILS_SERIALIZER': 'AUTH.serializers.UserCustomSerializer',
     'TOKEN_MODEL': 'rest_framework.authtoken.models.Token',
+    'SESSION_LOGIN': False,
     'USE_JWT': False,
 }
 
@@ -176,6 +176,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'RESTful API with token authentication, roles and permissions',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'POSTPROCESSING_HOOKS': ['backend.schema_hooks.organize_tags'],
     'SWAGGER_UI_SETTINGS': {
         'deepLinking': True,
         'persistAuthorization': True,

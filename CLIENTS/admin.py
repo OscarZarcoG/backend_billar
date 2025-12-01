@@ -1,5 +1,6 @@
 # CLIENTS/admin.py
 from django.contrib import admin
+from django.contrib import messages
 from django.utils.html import format_html
 from .models import Customer
 
@@ -20,7 +21,7 @@ class CustomerAdmin(admin.ModelAdmin):
     list_editable = ['frecuency']
 
     readonly_fields = [
-        'created_at', 'updated_at', 'deleted_at', 'is_active', 'is_deleted'
+        'created_at', 'updated_at', 'deleted_at', 'is_deleted'
     ]
 
     fieldsets = (
@@ -32,7 +33,7 @@ class CustomerAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('Status', {
-            'fields': ('is_active', 'is_deleted')
+            'fields': ('is_deleted',)
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at', 'deleted_at'),

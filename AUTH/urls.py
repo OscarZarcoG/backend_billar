@@ -1,4 +1,5 @@
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import UserCustomViewSet, GoogleLogin, GitHubLogin
 
 urlpatterns = [
@@ -10,19 +11,11 @@ urlpatterns = [
     path('auth/social/google/', GoogleLogin.as_view(), name='google-login'),
     path('auth/social/github/', GitHubLogin.as_view(), name='github-login'),
     
-    # U S E R   M A N A G E M E N T
-    path('auth/users/', UserCustomViewSet.as_view({'get': 'list'}), name='users-list'),
-    path('auth/users/<int:pk>/', UserCustomViewSet.as_view({
-        'get': 'retrieve',
-        'put': 'update', 
-        'patch': 'partial_update',
-        'delete': 'destroy'
-    }), name='users-detail'),
-    
-    # C U S T O M   A C T I O N S
-    path('auth/users/by-role/', UserCustomViewSet.as_view({'get': 'users_by_role'}), name='users-by-role'),
-    path('auth/users/<int:pk>/change-role/', UserCustomViewSet.as_view({'patch': 'change_user_role'}), name='change-role'),
-    path('auth/users/<int:pk>/hard-delete/', UserCustomViewSet.as_view({'delete': 'hard_delete_user'}), name='hard-delete'),
-    path('auth/users/<int:pk>/restore/', UserCustomViewSet.as_view({'patch': 'restore_user'}), name='restore-user'),
-    path('auth/users/change-password/', UserCustomViewSet.as_view({'post': 'change_password'}), name='change-password'),
+]
+
+router = DefaultRouter()
+router.register(r'auth/users', UserCustomViewSet, basename='users')
+
+urlpatterns += [
+    path('', include(router.urls)),
 ]
