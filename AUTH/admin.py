@@ -1,16 +1,13 @@
-# AUTH/admin.py
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.utils.html import format_html
-from django.urls import reverse
-from django.utils.safestring import mark_safe
 from .models import UserCustom
 from allauth.socialaccount.models import SocialAccount
 
 
 class SocialProviderFilter(admin.SimpleListFilter):
-    title = 'Origen'
-    parameter_name = 'origen'
+    title = 'Login Origin'
+    parameter_name = 'origin'
 
     def lookups(self, request, model_admin):
         return [
@@ -30,212 +27,109 @@ class SocialProviderFilter(admin.SimpleListFilter):
 
 @admin.register(UserCustom)
 class UserCustomAdmin(UserAdmin):
-    # Campos que se muestran en la lista
     list_display = (
-        'username',
-        'get_full_name',
-        'email',
-        'phone',
-        'role',
-        'gender',
-        'login_origin',
-        'is_active',
-        'is_staff',
-        'created_at',
-        'profile_image_preview'
+        'username', 'get_full_name', 'email', 'phone', 'role', 'gender',
+        'login_origin', 'is_active', 'is_staff', 'created_at', 'profile_image_preview'
     )
     
-    # Campos por los que se puede filtrar
     list_filter = (
-        'role',
-        'gender',
-        'is_active',
-        'is_staff',
-        'is_superuser',
-        'created_at',
-        'updated_at',
-        SocialProviderFilter,
+        'role', 'gender', 'is_active', 'is_staff', 'is_superuser',
+        'created_at', 'updated_at', SocialProviderFilter,
     )
     
-    # Campos de búsqueda
-    search_fields = (
-        'username',
-        'first_name',
-        'last_name',
-        'email',
-        'phone',
-    )
-    
-    # Ordenamiento por defecto
+    search_fields = ('username', 'first_name', 'last_name', 'email', 'phone')
     ordering = ('-created_at',)
-    
-    # Campos editables desde la lista
     list_editable = ('is_active', 'role')
-    
-    # Número de elementos por página
     list_per_page = 25
+    readonly_fields = ('created_at', 'updated_at', 'last_login', 'date_joined', 'profile_image_preview')
     
-    # Campos de solo lectura
-    readonly_fields = (
-        'created_at',
-        'updated_at',
-        'last_login',
-        'date_joined',
-        'profile_image_preview'
-    )
-    
-    # Configuración de fieldsets para el formulario de edición
     fieldsets = (
-        ('Información Personal', {
-            'fields': (
-                'username',
-                'first_name',
-                'last_name',
-                'email',
-                'phone',
-                'birthday',
-                'gender'
-            )
+        ('Personal Information', {
+            'fields': ('username', 'first_name', 'last_name', 'email', 'phone', 'birthday', 'gender')
         }),
-        ('Imagen de Perfil', {
+        ('Profile Image', {
             'fields': ('image_profile', 'profile_image_preview'),
             'classes': ('collapse',)
         }),
-        ('Permisos y Roles', {
-            'fields': (
-                'role',
-                'is_active',
-                'is_staff',
-                'is_superuser',
-                'groups',
-                'user_permissions'
-            )
+        ('Permissions & Roles', {
+            'fields': ('role', 'is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')
         }),
-        ('Contraseña', {
+        ('Password', {
             'fields': ('password',),
             'classes': ('collapse',)
         }),
-        ('Fechas Importantes', {
-            'fields': (
-                'last_login',
-                'date_joined',
-                'created_at',
-                'updated_at'
-            ),
+        ('Important Dates', {
+            'fields': ('last_login', 'date_joined', 'created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
     
-    # Fieldsets para agregar usuario
     add_fieldsets = (
-        ('Información Básica', {
+        ('Basic Information', {
             'classes': ('wide',),
-            'fields': (
-                'username',
-                'first_name',
-                'last_name',
-                'email',
-                'phone',
-                'password1',
-                'password2'
-            )
+            'fields': ('username', 'first_name', 'last_name', 'email', 'phone', 'password1', 'password2')
         }),
-        ('Información Adicional', {
+        ('Additional Information', {
             'classes': ('wide', 'collapse'),
-            'fields': (
-                'birthday',
-                'gender',
-                'image_profile',
-                'role'
-            )
+            'fields': ('birthday', 'gender', 'image_profile', 'role')
         }),
-        ('Permisos', {
+        ('Permissions', {
             'classes': ('wide', 'collapse'),
-            'fields': (
-                'is_active',
-                'is_staff',
-                'is_superuser'
-            )
+            'fields': ('is_active', 'is_staff', 'is_superuser')
         }),
     )
     
-    # Métodos personalizados para mostrar información
     def get_full_name(self, obj):
-        """Retorna el nombre completo del usuario"""
         return f"{obj.first_name} {obj.last_name}"
-    get_full_name.short_description = 'Nombre Completo'
+    get_full_name.short_description = 'Full Name'
     get_full_name.admin_order_field = 'first_name'
     
     def profile_image_preview(self, obj):
-        """Muestra una vista previa de la imagen de perfil"""
         if obj.image_profile:
             return format_html(
                 '<img src="{}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />',
                 obj.image_profile.url
             )
-        return "Sin imagen"
-    profile_image_preview.short_description = 'Vista Previa'
+        return "No image"
+    profile_image_preview.short_description = 'Preview'
 
     def login_origin(self, obj):
-        """Muestra el origen de autenticación (Local/Google/GitHub)"""
         providers = list(obj.socialaccount_set.values_list('provider', flat=True))
         if not providers:
             return 'Local'
         return ', '.join(p.capitalize() for p in providers)
-    login_origin.short_description = 'Origen'
+    login_origin.short_description = 'Origin'
     
-    # Acciones personalizadas
     actions = ['activate_users', 'deactivate_users', 'make_admin', 'make_client']
     
     def activate_users(self, request, queryset):
-        """Activa usuarios seleccionados"""
         updated = queryset.update(is_active=True)
-        self.message_user(
-            request,
-            f'{updated} usuario(s) activado(s) exitosamente.'
-        )
-    activate_users.short_description = "Activar usuarios seleccionados"
+        self.message_user(request, f'{updated} user(s) activated')
+    activate_users.short_description = "Activate users"
     
     def deactivate_users(self, request, queryset):
-        """Desactiva usuarios seleccionados"""
         updated = queryset.update(is_active=False)
-        self.message_user(
-            request,
-            f'{updated} usuario(s) desactivado(s) exitosamente.'
-        )
-    deactivate_users.short_description = "Desactivar usuarios seleccionados"
+        self.message_user(request, f'{updated} user(s) deactivated')
+    deactivate_users.short_description = "Deactivate users"
     
     def make_admin(self, request, queryset):
-        """Convierte usuarios seleccionados en administradores"""
         updated = queryset.update(role='admin')
-        self.message_user(
-            request,
-            f'{updated} usuario(s) convertido(s) en administrador(es).'
-        )
-    make_admin.short_description = "Hacer administradores"
+        self.message_user(request, f'{updated} user(s) converted to admin')
+    make_admin.short_description = "Make administrators"
     
     def make_client(self, request, queryset):
-        """Convierte usuarios seleccionados en clientes"""
         updated = queryset.update(role='client')
-        self.message_user(
-            request,
-            f'{updated} usuario(s) convertido(s) en cliente(s).'
-        )
-    make_client.short_description = "Hacer clientes"
+        self.message_user(request, f'{updated} user(s) converted to client')
+    make_client.short_description = "Make clients"
     
-    # Personalizar el título del admin
     def get_queryset(self, request):
-        """Optimiza las consultas incluyendo campos relacionados"""
         qs = super().get_queryset(request)
         return qs.select_related().prefetch_related('groups', 'user_permissions', 'socialaccount_set')
     
-    # Personalizar permisos
     def has_delete_permission(self, request, obj=None):
-        """Solo superusuarios pueden eliminar usuarios"""
         return request.user.is_superuser
     
     def has_change_permission(self, request, obj=None):
-        """Usuarios pueden editar su propio perfil, admins pueden editar otros"""
         if obj is None:
             return True
         if request.user.is_superuser:
@@ -245,7 +139,6 @@ class UserCustomAdmin(UserAdmin):
         return obj == request.user
 
 
-# Personalizar el título del sitio admin
-admin.site.site_header = "BilZapp - Panel de Administración"
+admin.site.site_header = "BilZapp Administration"
 admin.site.site_title = "BilZapp Admin"
-admin.site.index_title = "Bienvenido al Panel de Administración de BilZapp"
+admin.site.index_title = "Welcome to BilZapp Administration"

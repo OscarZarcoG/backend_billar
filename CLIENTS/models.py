@@ -12,7 +12,7 @@ FRECUENCY_CHOICES = (
     ('OCCASIONAL', 'Occasional'),
     ('REGULAR', 'Regular'),
     ('FREQUENT', 'Frequent'),
-)
+)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 
 class Customer(BaseModel):
     frecuency = models.CharField(
