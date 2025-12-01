@@ -37,7 +37,6 @@ class UserCustomManager(BaseManager, UserManager):
 
         return self._create_user(username, email, password, **extra_fields)
 
-
 class UserCustom(AbstractUser, BaseModel):
     objects = UserCustomManager()
     
