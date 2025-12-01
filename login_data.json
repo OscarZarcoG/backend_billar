@@ -178,11 +178,11 @@
     },
     "admin_login": {
       "username": "user_admin_test",
-      "password": "AdminTest#2025!"
+      "password": "AdmTest#2025!"
     },
     "client_login": {
       "username": "user_client_test",
-      "password": "ClientTest#2025!"
+      "password": "CliTest#2025!"
     }
   },
   "register_data": {

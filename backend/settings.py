@@ -176,6 +176,7 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'RESTful API with token authentication, roles and permissions',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    'POSTPROCESSING_HOOKS': ['backend.schema_hooks.organize_tags'],
     'SWAGGER_UI_SETTINGS': {
         'deepLinking': True,
         'persistAuthorization': True,
