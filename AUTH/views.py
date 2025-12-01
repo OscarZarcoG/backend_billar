@@ -1,9 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.hashers import check_password
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 from dj_rest_auth.registration.views import SocialLoginView
@@ -18,7 +16,6 @@ from .permissions import IsRoot, IsAdminOrRoot
 
 
 # S O C I A L   A U T H E N T I C A T I O N
-
 @extend_schema(
     summary="Google social login",
     tags=["Social Authentication"],
@@ -40,7 +37,6 @@ class GitHubLogin(SocialLoginView):
 
 
 # U S E R   M A N A G E M E N T
-
 @extend_schema_view(
     list=extend_schema(summary="List users", tags=["Users"]),
     retrieve=extend_schema(summary="Get user", tags=["Users"]),
@@ -53,45 +49,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
     serializer_class = UserCustomSerializer
     permission_classes = [IsAuthenticated]
     
-    @extend_schema(
-        summary="Change password",
-        tags=["Users"],
-        request={
-            'application/json': {
-                'type': 'object',
-                'properties': {
-                    'old_password': {'type': 'string'},
-                    'new_password': {'type': 'string'},
-                },
-                'required': ['old_password', 'new_password']
-            }
-        },
-        responses={200: OpenApiTypes.OBJECT, 400: OpenApiTypes.OBJECT},
-    )
-    @action(detail=False, methods=['post'])
-    def change_password(self, request):
-        old_password = request.data.get('old_password')
-        new_password = request.data.get('new_password')
-        
-        if not old_password or not new_password:
-            raise ValidationError(detail='Both passwords are required')
-        
-        if not check_password(old_password, request.user.password):
-            raise ValidationError(detail='Current password is incorrect')
-        
-        request.user.set_password(new_password)
-        request.user.save()
-        
-        try:
-            request.user.auth_token.delete()
-        except:
-            pass
-        token = Token.objects.create(user=request.user)
-        
-        return Response({
-            'message': 'Password changed successfully',
-            'token': token.key
-        })
+    
     
     @extend_schema(
         summary="Filter users by role",
@@ -107,7 +65,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         ],
         responses={200: UserCustomSerializer(many=True), 403: OpenApiTypes.OBJECT},
     )
-    @action(detail=False, methods=['get'], permission_classes=[IsAdminOrRoot])
+    @action(detail=False, methods=['get'], permission_classes=[IsAdminOrRoot], url_path='by-role')
     def users_by_role(self, request):
         role = request.query_params.get('role')
         users = UserCustom.objects.filter(role=role, is_active=True) if role else UserCustom.objects.filter(is_active=True)
@@ -128,7 +86,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         },
         responses={200: UserCustomSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT},
     )
-    @action(detail=True, methods=['patch'], permission_classes=[IsRoot])
+    @action(detail=True, methods=['patch'], permission_classes=[IsRoot], url_path='change-role')
     def change_user_role(self, request, pk=None):
         user = self.get_object()
         new_role = request.data.get('role')
@@ -152,7 +110,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         tags=["Users"],
         responses={204: None, 403: OpenApiTypes.OBJECT, 404: OpenApiTypes.OBJECT},
     )
-    @action(detail=True, methods=['delete'], permission_classes=[IsAdminOrRoot])
+    @action(detail=True, methods=['delete'], permission_classes=[IsAdminOrRoot], url_path='hard-delete')
     def hard_delete_user(self, request, pk=None):
         user = self.get_object()
         
@@ -160,7 +118,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
             raise PermissionDenied(detail='Cannot delete yourself')
         
         try:
-            user.hard_delete(user=request.user)
+            user.hard_delete()
             return Response({'message': 'User deleted permanently'}, status=status.HTTP_204_NO_CONTENT)
         except PermissionError as e:
             raise PermissionDenied(detail=str(e))
@@ -170,7 +128,7 @@ class UserCustomViewSet(viewsets.ModelViewSet):
         tags=["Users"],
         responses={200: UserCustomSerializer, 400: OpenApiTypes.OBJECT, 403: OpenApiTypes.OBJECT},
     )
-    @action(detail=True, methods=['patch'], permission_classes=[IsAdminOrRoot])
+    @action(detail=True, methods=['patch'], permission_classes=[IsAdminOrRoot], url_path='restore')
     def restore_user(self, request, pk=None):
         user = self.get_object()
         user.restore()

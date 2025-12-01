@@ -7,7 +7,7 @@ from django.utils import timezone
 
 class UserCustomManager(BaseManager, UserManager):
     def get_queryset(self):
-        return super(UserManager, self).get_queryset().filter(deleted_at__isnull=True)
+        return super().get_queryset()
     
     def _create_user(self, username, email, password, **extra_fields):
         if not username:
@@ -41,7 +41,6 @@ class UserCustomManager(BaseManager, UserManager):
 class UserCustom(AbstractUser, BaseModel):
     objects = UserCustomManager()
     
-
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name='groups',
@@ -58,7 +57,6 @@ class UserCustom(AbstractUser, BaseModel):
         related_name='custom_user_set',
         related_query_name='custom_user',
     )
-
 
     email = models.EmailField(
         'email address',
@@ -127,9 +125,12 @@ class UserCustom(AbstractUser, BaseModel):
     
     def save(self, *args, **kwargs):
         if not hasattr(self, '_skip_role_permissions'):
-            if self.role in ['root', 'admin']:
+            if self.role == 'root':
                 self.is_staff = True
                 self.is_superuser = True
+            elif self.role == 'admin':
+                self.is_staff = True
+                self.is_superuser = False
             else:
                 self.is_staff = False
                 self.is_superuser = False
