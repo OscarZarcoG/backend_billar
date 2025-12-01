@@ -155,8 +155,8 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        #'rest_framework.permissions.AllowAny',
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+        #'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
@@ -166,6 +166,7 @@ REST_AUTH = {
     'REGISTER_SERIALIZER': 'AUTH.serializers.CustomRegisterSerializer',
     'USER_DETAILS_SERIALIZER': 'AUTH.serializers.UserCustomSerializer',
     'TOKEN_MODEL': 'rest_framework.authtoken.models.Token',
+    'SESSION_LOGIN': False,
     'USE_JWT': False,
 }
 

@@ -1,0 +1,282 @@
+{
+  "info": {
+    "name": "PoolZapp API Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000/api" },
+    { "key": "auth_token", "value": "" },
+    { "key": "user_id", "value": "" },
+    { "key": "role", "value": "client" }
+  ],
+  "item": [
+    {
+      "name": "POST",
+      "item": [
+        {
+          "name": "REGISTER - ROOT",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/registration/", "host": ["{{base_url}}"], "path": ["auth", "registration", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user_root_test\",\n  \"first_name\": \"User\",\n  \"last_name\": \"Root Test\",\n  \"email\": \"user_root_test@poolzapp.com\",\n  \"password1\": \"RootTest#2025!\",\n  \"password2\": \"RootTest#2025!\",\n  \"phone\": \"+34111111111\",\n  \"birthday\": \"1990-01-01\",\n  \"gender\": \"male\",\n  \"role\": \"root\"\n}"
+            }
+          }
+        },
+        {
+          "name": "REGISTER - ADMIN",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/registration/", "host": ["{{base_url}}"], "path": ["auth", "registration", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user_admin_test\",\n  \"first_name\": \"User\",\n  \"last_name\": \"Admin Test\",\n  \"email\": \"user_admin_test@poolzapp.com\",\n  \"password1\": \"AdmTest#2025!\",\n  \"password2\": \"AdmTest#2025!\",\n  \"phone\": \"+34222222222\",\n  \"birthday\": \"1992-02-02\",\n  \"gender\": \"female\",\n  \"role\": \"admin\"\n}"
+            }
+          }
+        },
+        {
+          "name": "REGISTER - CLIENT",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/registration/", "host": ["{{base_url}}"], "path": ["auth", "registration", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user_client_test\",\n  \"first_name\": \"User\",\n  \"last_name\": \"Client Test\",\n  \"email\": \"user_client_test@poolzapp.com\",\n  \"password1\": \"CliTest#2025!\",\n  \"password2\": \"CliTest#2025!\",\n  \"phone\": \"+34333333333\",\n  \"birthday\": \"1995-03-03\",\n  \"gender\": \"male\",\n  \"role\": \"client\"\n}"
+            }
+          }
+        },
+        {
+          "name": "LOGIN - ROOT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.key) { pm.collectionVariables.set('auth_token', json.key); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{base_url}}/auth/login/", "host": ["{{base_url}}"], "path": ["auth", "login", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"user_root_test\",\n  \"password\": \"RootTest#2025!\"\n}" }
+          }
+        },
+        {
+          "name": "LOGIN - ADMIN",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const json = pm.response.json();","if (json && json.key) { pm.collectionVariables.set('auth_token', json.key); }"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{base_url}}/auth/login/", "host": ["{{base_url}}"], "path": ["auth", "login", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"user_admin_test\",\n  \"password\": \"AdmTest#2025!\"\n}" }
+          }
+        },
+        {
+          "name": "LOGIN - CLIENT",
+          "event": [
+            { "listen": "test", "script": { "exec": ["const json = pm.response.json();","if (json && json.key) { pm.collectionVariables.set('auth_token', json.key); }"], "type": "text/javascript" } }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{base_url}}/auth/login/", "host": ["{{base_url}}"], "path": ["auth", "login", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"username\": \"user_client_test\",\n  \"password\": \"CliTest#2025!\"\n}" }
+          }
+        },
+        {
+          "name": "LOGOUT",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Token {{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/logout/", "host": ["{{base_url}}"], "path": ["auth", "logout", ""] }
+          }
+        },
+        {
+          "name": "CHANGE-PASS",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Token {{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/password/change/", "host": ["{{base_url}}"], "path": ["auth", "password", "change", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"old_password\": \"RootTest#2025!\",\n  \"new_password1\": \"RootTest#2026!\",\n  \"new_password2\": \"RootTest#2026!\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET",
+      "item": [
+        {
+          "name": "ABOUT ME",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) { pm.collectionVariables.set('user_id', json.id); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Token {{auth_token}}" } ],
+            "url": { "raw": "{{base_url}}/auth/user/", "host": ["{{base_url}}"], "path": ["auth", "user", ""] }
+          }
+        },
+        {
+          "name": "USERS-BY-ROLE",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Token {{auth_token}}" } ],
+            "url": {
+              "raw": "{{base_url}}/auth/users/by-role/?role={{role}}",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "users", "by-role", ""],
+              "query": [ { "key": "role", "value": "{{role}}" } ]
+            }
+          }
+        },
+        {
+          "name": "LIST",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Token {{auth_token}}" } ],
+            "url": { "raw": "{{base_url}}/auth/users/", "host": ["{{base_url}}"], "path": ["auth", "users", ""] }
+          }
+        },
+        {
+          "name": "USER-DETAIL",
+          "request": {
+            "method": "GET",
+            "header": [ { "key": "Authorization", "value": "Token {{auth_token}}" } ],
+            "url": { "raw": "{{base_url}}/auth/users/{{user_id}}/", "host": ["{{base_url}}"], "path": ["auth", "users", "{{user_id}}", ""] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PUT",
+      "item": [
+        {
+          "name": "UPDATE-PROFILE",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Token {{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/user/", "host": ["{{base_url}}"], "path": ["auth", "user", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"user_root_test\",\n  \"first_name\": \"User\",\n  \"last_name\": \"Root Test\",\n  \"email\": \"user_root_test@poolzapp.com\",\n  \"phone\": \"+34111111111\",\n  \"birthday\": \"1990-01-01\",\n  \"gender\": \"male\",\n  \"role\": \"root\"\n}"
+            }
+          }
+        },
+        {
+          "name": "UPDATE-USER",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Token {{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/users/{{user_id}}/", "host": ["{{base_url}}"], "path": ["auth", "users", "{{user_id}}", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Usuario Actualizado\",\n  \"last_name\": \"Apellido Nuevo\",\n  \"email\": \"usuario.actualizado@email.com\",\n  \"phone\": \"+34999999999\",\n  \"role\": \"admin\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PATCH",
+      "item": [
+        {
+          "name": "UPDATE-USER-PARTIAL",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Token {{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/users/{{user_id}}/", "host": ["{{base_url}}"], "path": ["auth", "users", "{{user_id}}", ""] },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Nombre Parcial\"\n}"
+            }
+          }
+        },
+        {
+          "name": "RESTORE-ACTIVATE",
+          "request": {
+            "method": "PATCH",
+            "header": [ { "key": "Authorization", "value": "Token {{auth_token}}" } ],
+            "url": { "raw": "{{base_url}}/auth/users/{{user_id}}/restore/", "host": ["{{base_url}}"], "path": ["auth", "users", "{{user_id}}", "restore", ""] }
+          }
+        },
+        {
+          "name": "CHANGE-ROLE-USERS",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Authorization", "value": "Token {{auth_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": { "raw": "{{base_url}}/auth/users/{{user_id}}/change-role/", "host": ["{{base_url}}"], "path": ["auth", "users", "{{user_id}}", "change-role", ""] },
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"admin\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "DELETE",
+      "item": [
+        {
+          "name": "DESACTIVATE",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Token {{auth_token}}" } ],
+            "url": { "raw": "{{base_url}}/auth/users/{{user_id}}/", "host": ["{{base_url}}"], "path": ["auth", "users", "{{user_id}}", ""] }
+          }
+        },
+        {
+          "name": "HARD-DELETE",
+          "request": {
+            "method": "DELETE",
+            "header": [ { "key": "Authorization", "value": "Token {{auth_token}}" } ],
+            "url": { "raw": "{{base_url}}/auth/users/{{user_id}}/hard-delete/", "host": ["{{base_url}}"], "path": ["auth", "users", "{{user_id}}", "hard-delete", ""] }
+          }
+        }
+      ]
+    }
+  ]
+}

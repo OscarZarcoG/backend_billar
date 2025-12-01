@@ -3,11 +3,11 @@
     "base_url": "http://localhost:8000/api",
     "auth_endpoints": {
       "register": {
-        "url": "/auth/register/",
+        "url": "/auth/registration/",
         "method": "POST",
         "description": "Registrar nuevo usuario",
         "auth_required": false,
-        "body_example": "register_data.new_client",
+        "body_example": "register_data.new_client_test",
         "code": "201 Created",
         "status": "Running"
       },
@@ -26,53 +26,53 @@
         "description": "Cerrar sesión",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "code": "200 OK",
         "status": "Running"
       },
       "about me": {
-        "url": "/auth/me/",
+        "url": "/auth/user/",
         "method": "GET",
         "description": "Obtener información del usuario actual",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "code": "200 OK",
         "status": "Running"
       },
       "update_profile": {
-        "url": "/auth/update-profile/",
+        "url": "/auth/user/",
         "method": "PUT/PATCH",
         "description": "Actualizar perfil del usuario actual",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "body_example": "update_profile_data",
         "code": "200 OK",
         "status": "Running"
       },
       "change_password": {
-        "url": "/auth/change-password/",
+        "url": "/auth/password/change/",
         "method": "POST",
         "description": "Cambiar contraseña del usuario actual",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "body_example": "change_password_data",
         "code": "200 OK",
         "status": "Running"
       },
       "users_by_role": {
-        "url": "/auth/users-by-role/",
+        "url": "/auth/users/by-role/",
         "method": "GET",
         "description": "Obtener usuarios por rol (admin/root only)",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "query_params": {
           "role": "client|admin|root (opcional)"
@@ -81,90 +81,90 @@
         "status": "Running"
       },
       "list_users": {
-        "url": "/auth/",
+        "url": "/auth/users/",
         "method": "GET",
         "description": "Listar todos los usuarios activos",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "code": "200 OK",
         "status": "Running"
       },
       "user_detail": {
-        "url": "/auth/{id}/",
+        "url": "/auth/users/{id}/",
         "method": "GET",
         "description": "Obtener detalles de un usuario específico",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         }
       },
       "update_user": {
-        "url": "/auth/{id}/",
+        "url": "/auth/users/{id}/",
         "method": "PUT",
         "description": "Actualizar usuario específico (solo root puede cambiar roles)",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "body_example": "update_user_data",
         "code": "200 OK",
         "status": "Running"
       },
       "partial_update_user": {
-        "url": "/auth/{id}/",
+        "url": "/auth/users/{id}/",
         "method": "PATCH",
         "description": "Actualización parcial de usuario específico",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "body_example": "partial_update_user_data",
         "code": "200 OK",
         "status": "Running"
       },
       "soft_delete_user": {
-        "url": "/auth/{id}/",
+        "url": "/auth/users/{id}/",
         "method": "DELETE",
         "description": "Desactivar usuario (soft delete)",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "code": "204 No Content",
         "status": "Running"
       },
       "change_user_role": {
-        "url": "/auth/{id}/change-user-role/",
+        "url": "/auth/users/{id}/change-role/",
         "method": "PATCH",
         "description": "Cambiar rol de usuario (solo root)",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "body_example": "change_role_data",
         "code": "200 OK",
         "status": "Running"
       },
       "hard_delete": {
-        "url": "/auth/{id}/hard-delete/",
+        "url": "/auth/users/{id}/hard-delete/",
         "method": "DELETE",
-        "description": "Eliminar usuario permanentemente (solo root)",
+        "description": "Eliminar usuario permanentemente (admin/root)",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "code": "204 No Content",
         "status": "Running"
       },
       "restore": {
-        "url": "/auth/{id}/restore/",
+        "url": "/auth/users/{id}/restore/",
         "method": "PATCH",
         "description": "Restaurar usuario desactivado (admin/root)",
         "auth_required": true,
         "headers": {
-          "Authorization": "Token {token}"
+          "Authorization": "Token {{auth_token}}"
         },
         "code": "200 OK",
         "status": "Running"
@@ -172,90 +172,87 @@
     }
   },
   "login_data": {
+    "root_login": {
+      "username": "user_root_test",
+      "password": "RootTest#2025!"
+    },
     "admin_login": {
-      "username": "laura_admin",
-      "password": "AdminPass456*"
+      "username": "user_admin_test",
+      "password": "AdminTest#2025!"
     },
     "client_login": {
-      "username": "pedro_cliente",
-      "password": "NuevoPass123!"
-    },
-    "root_login": {
-      "username": "daniel",
-      "password": "dasher123"
+      "username": "user_client_test",
+      "password": "ClientTest#2025!"
     }
   },
   "register_data": {
-    "new_client": {
-      "username": "pedro_cliente",
-      "first_name": "Pedro",
-      "last_name": "Sánchez",
-      "email": "pedro.sanchez@email.com",
-      "password": "NuevoPass123!",
-      "password_confirm": "NuevoPass123!",
-      "phone": "+34600111222",
-      "birthday": "1993-07-18",
+    "new_root_test": {
+      "username": "user_root_test",
+      "first_name": "User",
+      "last_name": "Root Test",
+      "email": "user_root_test@poolzapp.com",
+      "password1": "RootTest#2025!",
+      "password2": "RootTest#2025!",
+      "phone": "+34111111111",
+      "birthday": "1990-01-01",
       "gender": "male",
-      "role": "client"
+      "role": "root"
     },
-    "new_admin": {
-      "username": "laura_admin",
-      "first_name": "Laura",
-      "last_name": "Fernández",
-      "email": "laura.fernandez@empresa.com",
-      "password": "AdminPass456*",
-      "password_confirm": "AdminPass456*",
-      "phone": "+34700333444",
-      "birthday": "1987-04-25",
+    "new_admin_test": {
+      "username": "user_admin_test",
+      "first_name": "User",
+      "last_name": "Admin Test",
+      "email": "user_admin_test@poolzapp.com",
+      "password1": "AdminTest#2025!",
+      "password2": "AdminTest#2025!",
+      "phone": "+34222222222",
+      "birthday": "1992-02-02",
       "gender": "female",
       "role": "admin"
     },
-    "new_root": {
-      "username": "daniel",
-      "first_name": "Oscar Daniel",
-      "last_name": "Zarco González",
-      "email": "daniel@gmail.com",
-      "password": "dasher123",
-      "password_confirm": "dasher123",
-      "phone": "7291428946",
-      "birthday": "2003-12-18",
+    "new_client_test": {
+      "username": "user_client_test",
+      "first_name": "User",
+      "last_name": "Client Test",
+      "email": "user_client_test@poolzapp.com",
+      "password1": "ClientTest#2025!",
+      "password2": "ClientTest#2025!",
+      "phone": "+34333333333",
+      "birthday": "1995-03-03",
       "gender": "male",
-      "role": "root"
+      "role": "client"
     }
   },
   "update_profile_data": {
-    "username": "daniel",
-    "first_name": "Oscar",
-    "last_name": "Zarco González",
-    "email": "danielzargon@gmail.com",
-    "password": "dasher123",
-    "password_confirm": "dasher123",
-    "phone": "7291428946",
-    "birthday": "2003-12-18",
+    "username": "user_root_test",
+    "first_name": "User",
+    "last_name": "Root Test",
+    "email": "user_root_test@poolzapp.com",
+    "phone": "+34111111111",
+    "birthday": "1990-01-01",
     "gender": "male",
     "role": "root"
   },
   "restore_profile_data": {
-    "username": "daniel",
-    "first_name": "Oscar Daniel",
-    "last_name": "Zarco González",
-    "email": "daniel@gmail.com",
-    "password": "dasher123",
-    "password_confirm": "dasher123",
-    "phone": "7291428946",
-    "birthday": "2003-12-18",
+    "username": "user_root_test",
+    "first_name": "User",
+    "last_name": "Root Test",
+    "email": "user_root_test@poolzapp.com",
+    "phone": "+34111111111",
+    "birthday": "1990-01-01",
     "gender": "male",
     "role": "root"
   },
   "change_password_data": {
-    "old_password": "dasher123",
-    "new_password": "dasher135"
+    "old_password": "RootTest#2025!",
+    "new_password1": "RootTest#2026!",
+    "new_password2": "RootTest#2026!"
   },
   "update_user_data": {
     "first_name": "Usuario Actualizado",
     "last_name": "Apellido Nuevo",
     "email": "usuario.actualizado@email.com",
-    "phone": "+34700888999",
+    "phone": "+34999999999",
     "role": "admin"
   },
   "partial_update_user_data": {
@@ -266,31 +263,31 @@
   },
   "test_scenarios": {
     "authentication_flow": {
-      "1": "POST /auth/register/ - Registrar nuevo usuario",
+      "1": "POST /auth/registration/ - Registrar nuevo usuario",
       "2": "POST /auth/login/ - Iniciar sesión con el usuario registrado",
-      "3": "GET /auth/me/ - Verificar información del usuario autenticado",
+      "3": "GET /auth/user/ - Verificar información del usuario autenticado",
       "4": "POST /auth/logout/ - Cerrar sesión"
     },
     "user_management_flow": {
       "1": "POST /auth/login/ - Iniciar sesión como root",
-      "2": "GET /auth/ - Listar todos los usuarios",
-      "3": "GET /auth/users-by-role/?role=client - Filtrar usuarios por rol",
-      "4": "PATCH /auth/{id}/change-user-role/ - Cambiar rol de usuario",
-      "5": "DELETE /auth/{id}/ - Desactivar usuario (soft delete)",
-      "6": "PATCH /auth/{id}/restore/ - Restaurar usuario",
-      "7": "DELETE /auth/{id}/hard-delete/ - Eliminar permanentemente"
+      "2": "GET /auth/users/ - Listar todos los usuarios",
+      "3": "GET /auth/users/by-role/?role=client - Filtrar usuarios por rol",
+      "4": "PATCH /auth/users/{id}/change-role/ - Cambiar rol de usuario",
+      "5": "DELETE /auth/users/{id}/ - Desactivar usuario (soft delete)",
+      "6": "PATCH /auth/users/{id}/restore/ - Restaurar usuario",
+      "7": "DELETE /auth/users/{id}/hard-delete/ - Eliminar permanentemente"
     },
     "profile_management_flow": {
       "1": "POST /auth/login/ - Iniciar sesión",
-      "2": "PUT /auth/update-profile/ - Actualizar perfil completo",
-      "3": "POST /auth/change-password/ - Cambiar contraseña",
-      "4": "GET /auth/me/ - Verificar cambios"
+      "2": "PUT /auth/user/ - Actualizar perfil completo",
+      "3": "POST /auth/password/change/ - Cambiar contraseña",
+      "4": "GET /auth/user/ - Verificar cambios"
     }
   },
   "postman_collection_info": {
     "variables": {
       "base_url": "http://localhost:8000/api",
-      "token": "{{auth_token}}",
+      "auth_token": "{{auth_token}}",
       "user_id": "{{user_id}}"
     },
     "headers": {
